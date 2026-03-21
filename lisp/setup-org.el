@@ -9,27 +9,16 @@
   (save-excursion
     (widen)
     (goto-char (point-min))
-    (when (re-search-forward "^#\\+last_modified:" (point-max) t)
-      (delete-current-line)
-      (insert (concat "#+last_modified: "
-                      (format-time-string " %Y/%m/%d %H:%M") "\n")))))
+    (let ((case-fold-search t))
+      (when (re-search-forward "^#\\+last_modified:" nil t)
+        (delete-region (line-beginning-position) (line-end-position))
+        (insert (concat "#+last_modified: "
+                        (format-time-string " %Y/%m/%d %H:%M")))))))
 
 ;; https://sachachua.com/dotemacs/index.html#org8d18f7e
 (defun my-org-convert-region-from-markdown (beg end)
   (interactive "r")
   (shell-command-on-region beg end "pandoc -t org" nil t))
-
-(defun skx/update-org-modified-property ()
-  "Update date in '#+LAST_MODIFIED' property."
-  (interactive)
-  (save-excursion
-    (widen)
-    (goto-char (point-min))
-    (when (re-search-forward "^#\\+last_modified:" (point-max) t)
-      (progn
-        ;;(kill-line)
-        (delete-current-line)
-        (insert (concat "#+last_modified: " (format-time-string " %Y/%m/%d %H:%M") "\n"))))))
 
 (defun org-syntax-convert-keyword-case-to-lower ()
   "Convert all #+KEYWORDS to #+keywords."
@@ -39,42 +28,36 @@
     (let ((count 0)
           (case-fold-search nil))
       (while (re-search-forward "^[ \t]*#\\+[A-Z_]+" nil t)
-        (unless (s-matches-p "RESULTS" (match-string 0))
+        (unless (string-match-p "RESULTS" (match-string 0))
           (replace-match (downcase (match-string 0)) t)
           (setq count (1+ count))))
       (message "Replaced %d occurances" count))))
 
 (add-hook! 'org-mode-hook
-  (add-hook 'before-save-hook
-            #'org-syntax-convert-keyword-case-to-lower)  nil 'make-it-local)
+  (add-hook 'before-save-hook #'org-syntax-convert-keyword-case-to-lower nil t)
+  (add-hook 'before-save-hook #'skx/update-org-modified-property nil t))
 
 
-(setq ;; org-adapt-indentation t
- ;; org-auto-align-tags nil
- org-confirm-babel-evaluate nil
- org-edit-src-content-indentation 4
- org-edit-src-persistent-message nil
- org-export-allow-bind-keywords t
- org-export-time-stamp-file t
- org-export-with-date nil
- org-export-with-email nil
- org-export-with-sub-superscripts '{}
- org-export-with-toc nil)
-
-(setq org-fold-catch-invisible-edits 'show
+(setq org-confirm-babel-evaluate nil
+      org-edit-src-content-indentation 4
+      org-edit-src-persistent-message nil
+      org-export-allow-bind-keywords t
+      org-export-time-stamp-file t
+      org-export-with-date nil
+      org-export-with-email nil
+      org-export-with-sub-superscripts '{}
+      org-export-with-toc nil
+      org-fold-catch-invisible-edits 'show
       org-fontify-quote-and-verse-blocks t
       org-fontify-whole-block-delimiter-line t
       org-footnote-auto-label t
       org-indirect-buffer-display 'other-window
       org-insert-heading-respect-content t
       org-link-descriptive t
-      org-list-allow-alphabetical t)
-
-(setq org-num-max-level 3
-      ;;org-pretty-entities t
-      ;;org-pretty-entities-include-sub-superscripts t
+      org-list-allow-alphabetical t
+      org-num-max-level 3
       org-preview-latex-image-directory "/home/asaade/tmp/ltximg"
-      org-startup-with-inline-images t
+      org-startup-with-inline-images 'display-graphic-p
       org-startup-with-latex-preview t
       org-return-follows-link t
       org-special-ctrl-a/e t
@@ -84,16 +67,9 @@
       org-src-window-setup 'current-window
       org-startup-folded 'content
       org-startup-indented nil
-      org-tags-column 0)
-
-;; https://github.com/xenodium/dotsies/blob/main/emacs/features/fe-org.el
-(setq org-fontify-emphasized-text t
-      ;; Fontify code in code blocks.
+      org-tags-column 0
+      org-fontify-emphasized-text t
       org-src-fontify-natively t
-      ;; Display images inline when running in GUI.
-      org-startup-with-inline-images 'display-graphic-p
-      org-src-tab-acts-natively t
-      ;; Prevent inadvertently editing invisible areas in Org.
       org-catch-invisible-edits 'error
       org-cycle-separator-lines 2
       org-image-actual-width 480
@@ -229,11 +205,6 @@ This is used as :override advice on `org-activate-footnote-links'."
 
 (use-package! scimax-ob-flycheck)
 
-
-(add-hook! 'org-mode-hook
-  (add-hook 'before-save-hook
-            #'skx/update-org-modified-property)  nil 'make-it-local)
-
 (setq org-latex-logfiles-extensions '("lof" "lot" "tex~" "aux" "idx" "log" "out" "toc" "nav" "snm"
                                       "vrb" "fdb_latexmk" "blg" "brf" "fls" "xml" "bcf" "entoc"
                                       "ps" "spl" "bbl" "thd" "spl" "bbl" "xmpi" "run.xml" "bcf" "acn"
@@ -241,8 +212,6 @@ This is used as :override advice on `org-activate-footnote-links'."
 (setq org-latex-remove-logfiles t)
 
 (use-package! ox-altacv)
-;;(use-package! ox-awesomecv2)
-;;(use-package! ox-moderncv)
 
 (after! org-re-reveal
   (add-to-list 'org-re-reveal-plugin-config '(menu "RevealMenu" "plugin/menu/menu.js"))
@@ -291,42 +260,6 @@ This is used as :override advice on `org-activate-footnote-links'."
       org-latex-pdf-process (list "latexmk -pdflatex='lualatex -synctex=1 -shell-escape -interaction nonstopmode' -shell-escape -pdf -bibtex -f -output-directory=%o %f"))
 
 (setq org-preview-latex-default-process 'dvisvgm)
-
-;; (setq org-preview-latex-process-alist
-;;       '((dvipng :programs ("latex" "dvipng") :description "dvi > png" :message
-;;          "you need to install the programs: latex and dvipng." :image-input-type
-;;          "dvi" :image-output-type "png" :image-size-adjust (1.0 . 1.0)
-;;          :latex-compiler
-;;          ("latex -interaction nonstopmode -output-directory %o %f")
-;;          :image-converter ("dvipng -D %D -T tight -o %O %f")
-;;          :transparent-image-converter
-;;          ("dvipng -D %D -T tight -bg Transparent -o %O %f"))
-;;         (dvisvgm :programs ("latex" "dvisvgm") :description "dvi > svg" :message
-;;                  "you need to install the programs: latex and dvisvgm."
-;;                  :image-input-type "dvi" :image-output-type "svg" :image-size-adjust
-;;                  (1.7 . 1.5) :latex-compiler
-;;                  ("latex -interaction nonstopmode -output-directory %o %f")
-;;                  :image-converter
-;;                  ("dvisvgm %f --no-fonts --exact-bbox --scale=%S --output=%O"))
-;;         (xelatex :programs ("xelatex" "dvisvgm") :description "xdv > svg" :message
-;;                  "you need to install the programs: xelatex and dvisvgm."
-;;                  :image-input-type "xdv" :image-output-type "svg" :image-size-adjust
-;;                  (1.7 . 1.5) :latex-compiler
-;;                  ("xelatex -no-pdf -interaction nonstopmode -output-directory %o %f")
-;;                  :image-converter
-;;                  ("dvisvgm %f --no-fonts --exact-bbox --scale=%S --output=%O"))
-;;         (imagemagick :programs ("latex" "convert") :description "pdf > png" :message
-;;                      "you need to install the programs: latex and imagemagick."
-;;                      :image-input-type "pdf" :image-output-type "png"
-;;                      :image-size-adjust (1.0 . 1.0) :latex-compiler
-;;                      ("pdflatex -interaction nonstopmode -output-directory %o %f")
-;;                      :image-converter
-;;                      ("convert -density %D -trim -antialias %f -quality 100 %O"))))
-
-;; (let ((png (cdr (assoc 'dvipng org-preview-latex-process-alist))))
-;;   (plist-put png :latex-compiler '("xelatex -interaction nonstopmode -output-directory %o %F"))
-;;   (plist-put png :image-converter '("dvipng -D %D -T tight -o %O %F"))
-;;   (plist-put png :transparent-image-converter '("dvipng -D %D -T tight -bg Transparent -o %O %F")))
 
 
 ;; https://github.com/emacsmirror/org-contrib
@@ -520,16 +453,6 @@ This is used as :override advice on `org-activate-footnote-links'."
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
 
 
-  ;; (add-to-list 'org-latex-classes
-  ;;              '("springer-enhanced"
-  ;;                "\\documentclass[graybox,envcountchap,sectrefs]{SVMonoEnhanced}
-  ;;               [PACKAGES]"
-
-  ;;                ("\\chapter{%s}" . "\\chapter*{%s}")
-  ;;                ("\\section{%s}" . "\\section*{%s}")
-  ;;                ("\\subsection{%s}" . "\\subsection*{%s}")
-  ;;                ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
-
   (add-to-list 'org-latex-classes
                '("springer-report"
                  "\\documentclass[letter, graybox,envcountchap,sectrefs]{svmono}"
@@ -552,13 +475,6 @@ This is used as :override advice on `org-activate-footnote-links'."
 
 ;; Hugo Export Functions
 (after! ox-hugo
-  ;; (setq org-hugo-link-desc-insert-type t
-  ;;       org-hugo-use-code-for-kbd t
-  ;;       org-hugo-paired-shortcodes "sidenote marginnote epigraph blockquote")
-
-  ;; (add-to-list 'org-hugo-special-block-type-properties '("sidenote" . (:trim-pre t :trim-post t)))
-  ;; (add-to-list 'org-hugo-special-block-type-properties '("marginnote" . (:trim-pre t :trim-post t)))
-
   (defun compile-dir-org ()
     "Publish all Org files in a directory."
     (interactive)
@@ -671,27 +587,29 @@ This is used as :override advice on `org-activate-footnote-links'."
 
 (add-hook 'org-roam-buffer-postrender-functions #'magit-section-show-level-2)
 
-(add-hook! 'org-roam-mode-hook
-  (add-hook! 'after-save-hook
-    (defun org-rename-to-new-title ()
-      (when-let*
-          ((old-file (buffer-file-name))
-           (is-roam-file (org-roam-file-p old-file))
-           (file-node (save-excursion
-                        (goto-char 1)
-                        (org-roam-node-at-point)))
-           (file-name  (file-name-base (org-roam-node-file file-node)))
-           (file-time  (or (and (string-match "\\`\\([0-9]\\{14\\}\\)-" file-name)
-                                (concat (match-string 1 file-name) "-"))
-                           ""))
-           (slug (org-roam-node-slug file-node))
-           (new-file (expand-file-name (concat file-time slug ".org")))
-           (different-name? (not (string-equal old-file new-file))))
+(defun org-rename-to-new-title ()
+  "Rename current org-roam file to match its title slug."
+  (when-let*
+      ((old-file (buffer-file-name))
+       (is-roam-file (org-roam-file-p old-file))
+       (file-node (save-excursion
+                    (goto-char 1)
+                    (org-roam-node-at-point)))
+       (file-name  (file-name-base (org-roam-node-file file-node)))
+       (file-time  (or (and (string-match "\\`\\([0-9]\\{14\\}\\)-" file-name)
+                            (concat (match-string 1 file-name) "-"))
+                       ""))
+       (slug (org-roam-node-slug file-node))
+       (new-file (expand-file-name (concat file-time slug ".org")))
+       (different-name? (not (string-equal old-file new-file))))
 
-        (rename-buffer new-file)
-        (rename-file old-file new-file)
-        (set-visited-file-name new-file)
-        (set-buffer-modified-p nil)))))
+    (rename-buffer new-file)
+    (rename-file old-file new-file)
+    (set-visited-file-name new-file)
+    (set-buffer-modified-p nil)))
+
+(add-hook! 'org-roam-mode-hook
+  (add-hook 'after-save-hook #'org-rename-to-new-title nil t))
 
 (add-to-list 'display-buffer-alist
              '("\\*org-roam\\*"
@@ -737,7 +655,7 @@ This is used as :override advice on `org-activate-footnote-links'."
           (org-table-align))
       (error
        (let ((file (read-file-name "NDJSON file: ")))
-         (insert (ndjson-to-org-table
+         (insert (ar/ndjson-to-org-table
                   (with-temp-buffer
                     (insert-file-contents file)
                     (buffer-string))))
@@ -757,14 +675,12 @@ This is used as :override advice on `org-activate-footnote-links'."
 (setopt global-corfu-modes
       '((not erc-mode circe-mode help-mode gud-mode vterm-mode org-mode markdown-mode text-mode) t))
 
-  (setq org-use-speed-commands
-        (lambda ()
-          (and (looking-at org-outline-regexp)
-               (looking-back "^\**"))))
+(setq org-use-speed-commands
+      (lambda ()
+        (and (looking-at org-outline-regexp)
+             (looking-back "^\\**" (line-beginning-position)))))
 
 (add-hook! org-mode (electric-indent-local-mode -1))
-
-;;(load! "notebook")
 
 (provide 'setup-org)
 ;;; setup-org.el ends here
