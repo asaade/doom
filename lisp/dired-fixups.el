@@ -308,9 +308,14 @@ for a given file or set of files. This function makes an intelligent guess."
              (ext (file-name-extension file))
              (initial
               (if (member ext '("png" "jpg" "gif"))
-                  ;;(concat "open -a seashore " (car files))
-                  ;; TODO: fix. This works for macos but not other platforms.
-                  (concat "open -a preview " (car files))
+                  (cond
+                   ((eq system-type 'darwin)
+                    (concat "open -a preview " (shell-quote-argument file)))
+                   ((eq system-type 'gnu/linux)
+                    (concat "xdg-open " (shell-quote-argument file)))
+                   ((eq system-type 'windows-nt)
+                    (concat "start " (shell-quote-argument file)))
+                   (t ""))
                 "")))
         (read-shell-command prompt initial))
 
