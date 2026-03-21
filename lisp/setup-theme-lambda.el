@@ -280,26 +280,26 @@ Also immediately enables `mixed-pitch-modes' if currently in one of the modes."
 ;;     '(misc-info matches major-mode process vcs))
 ;;   )
 
-;; (after! orderless
-;;   (defvar my-orderless-accent-replacements
-;;     '(("a" . "[aàáâãäå]")
-;;       ("e" . "[eèéêë]")
-;;       ("i" . "[iìíîï]")
-;;       ("o" . "[oòóôõöœ]")
-;;       ("u" . "[uùúûü]")
-;;       ("c" . "[cç]")
-;;       ("n" . "[nñ]")) ; in case anyone needs ñ for Spanish
+(after! orderless
+  (defvar my-orderless-accent-replacements
+    '(("a" . "[aàáâãäå]")
+      ("e" . "[eèéêë]")
+      ("i" . "[iìíîï]")
+      ("o" . "[oòóôõöœ]")
+      ("u" . "[uùúûü]")
+      ("c" . "[cç]")
+      ("n" . "[nñ]"))) ; in case anyone needs ñ for Spanish
 
-;;     (defun my-orderless-accent-dispatch (pattern &rest _)
-;;       (seq-reduce
-;;        (lambda (prev val)
-;;          (replace-regexp-in-string (car val) (cdr val) prev))
-;;        my-orderless-accent-replacements
-;;        pattern)))
+  (defun my-orderless-accent-dispatch (pattern &rest _)
+    (seq-reduce
+     (lambda (prev val)
+       (replace-regexp-in-string (car val) (cdr val) prev))
+     my-orderless-accent-replacements
+     pattern))
 
-;;   (setq completion-styles '(orderless basic)
-;;         completion-category-overrides '((file (styles basic partial-completion)))
-;;         orderless-style-dispatchers '(my-orderless-accent-dispatch orderless-affix-dispatch)))
+  (setq completion-styles '(orderless basic)
+        completion-category-overrides '((file (styles basic partial-completion)))
+        orderless-style-dispatchers '(my-orderless-accent-dispatch orderless-affix-dispatch)))
 
 
 (provide 'setup-theme-lambda)
