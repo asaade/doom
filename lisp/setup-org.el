@@ -715,7 +715,7 @@ This is used as :override advice on `org-activate-footnote-links'."
 (defun ar/ndjson-to-org-table (ndjson)
   "Convert NDJSON log string to an Org mode table."
   (let* ((rows (mapcar #'json-read-from-string (split-string ndjson "\n" t)))
-         (fields (read-string "Fields: " (mapconcat 'identity (mapcar #'symbol-name (mapcar #'car (car rows))) " ")))
+         (fields (read-string "Fields: " (mapconcat (lambda (x) (symbol-name (car x))) (car rows) " ")))
          (header (split-string fields)))
     (orgtbl-to-orgtbl
      (append
