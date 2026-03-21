@@ -284,12 +284,13 @@ With a prefix ARG always prompt for command to use."
 (defun eval-and-replace ()
   "Replace the preceding sexp with its value."
   (interactive)
-  (backward-kill-sexp)
-  (condition-case nil
-      (prin1 (eval (read (current-kill 0)))
-             (current-buffer))
-    (error (message "Invalid expression")
-           (insert (current-kill 0)))))
+  (let ((beg (save-excursion (backward-sexp) (point)))
+        (end (point)))
+    (condition-case nil
+        (let ((result (eval (read (buffer-substring beg end)) lexical-binding)))
+          (delete-region beg end)
+          (prin1 result (current-buffer)))
+      (error (message "Invalid expression")))))
 
 
 (use-package! iedit)
