@@ -162,39 +162,53 @@ Also immediately enables `mixed-pitch-modes' if currently in one of the modes."
 (set-char-table-range composition-function-table ?f '(["\\(?:ff?[fijlt]\\)" 0 font-shape-gstring]))
 (set-char-table-range composition-function-table ?T '(["\\(?:Th\\)" 0 font-shape-gstring]))
 
-;; (after! marginalia
-;;   (setq marginalia-censor-variables nil)
+(after! marginalia
+  (setq marginalia-censor-variables nil)
 
-;;   (defadvice! +marginalia--anotate-local-file-colorful (cand)
-;;     "Just a more colourful version of `marginalia--anotate-local-file'."
-;;     :override #'marginalia--annotate-local-file
-;;     (when-let (attrs (file-attributes (substitute-in-file-name
-;;                                        (marginalia--full-candidate cand))
-;;                                       'integer))
-;;       (marginalia--fields
-;;        ((marginalia--file-owner attrs)
-;;         :width 12 :face 'marginalia-file-owner)
-;;        ((marginalia--file-modes attrs))
-;;        ((+marginalia-file-size-colorful (file-attribute-size attrs))
-;;         :width 7)
-;;        ((+marginalia--time-colorful (file-attribute-modification-time attrs))
-;;         :width 12))))
+  (defadvice! +marginalia--annotate-local-file-colorful (cand)
+    "Just a more colourful version of `marginalia--annotate-local-file'."
+    :override #'marginalia--annotate-local-file
+    (marginalia--in-minibuffer
+      (when-let* ((attrs (ignore-errors
+                           (file-attributes (substitute-in-file-name
+                                             (marginalia--full-candidate cand))
+                                            'integer))))
+        (if (bound-and-true-p marginalia-align)
+            (if (eq marginalia-align 'right)
+                (marginalia--fields
+                 ((marginalia--file-owner attrs) :face 'marginalia-file-owner)
+                 ((marginalia--file-modes attrs))
+                 ((+marginalia-file-size-colorful (file-attribute-size attrs)) :width -7)
+                 ((+marginalia--time-colorful (file-attribute-modification-time attrs)) :width -12))
+              (marginalia--fields
+               ((marginalia--file-modes attrs))
+               ((+marginalia-file-size-colorful (file-attribute-size attrs)) :width 7)
+               ((+marginalia--time-colorful (file-attribute-modification-time attrs)) :width 12)
+               ((marginalia--file-owner attrs) :face 'marginalia-file-owner)))
+          ;; fallback if marginalia-align is not bound
+          (marginalia--fields
+           ((marginalia--file-owner attrs) :width 12 :face 'marginalia-file-owner)
+           ((marginalia--file-modes attrs))
+           ((+marginalia-file-size-colorful (file-attribute-size attrs)) :width 7)
+           ((+marginalia--time-colorful (file-attribute-modification-time attrs)) :width 12))))))
 
-;;   (defun +marginalia--time-colorful (time)
-;;     (let* ((seconds (float-time (time-subtract (current-time) time)))
-;;            (color (doom-blend
-;;                    (face-attribute 'marginalia-date :foreground nil t)
-;;                    (face-attribute 'marginalia-documentation :foreground nil t)
-;;                    (/ 1.0 (log (+ 3 (/ (+ 1 seconds) 345600.0)))))))
-;;       ;; 1 - log(3 + 1/(days + 1)) % grey
-;;       (propertize (marginalia--time time) 'face (list :foreground color))))
+  (defun +marginalia--time-colorful (time)
+    (let* ((seconds (float-time (time-subtract (current-time) time)))
+           (fg-date (face-attribute 'marginalia-date :foreground nil t))
+           (fg-doc  (face-attribute 'marginalia-documentation :foreground nil t))
+           (color (doom-blend
+                   (if (stringp fg-date) fg-date "white")
+                   (if (stringp fg-doc) fg-doc "gray")
+                   (max 0.0 (min 1.0 (/ 1.0 (log (+ 3 (/ (+ 1 seconds) 345600.0)))))))))
+      (propertize (marginalia--time time) 'face (list :foreground color))))
 
-;;   (defun +marginalia-file-size-colorful (size)
-;;     (let* ((size-index (/ (log (+ 1 size)) 7.0))
-;;            (color (if (< size-index 10000000) ; 10m
-;;                       (doom-blend 'orange 'green size-index)
-;;                     (doom-blend 'red 'orange (- size-index 1)))))
-;;       (propertize (file-size-human-readable size) 'face (list :foreground color)))))
+  (defun +marginalia-file-size-colorful (size)
+    (let* ((size-index (/ (log (+ 1.0 size)) 16.118)) ; log(10,000,000)
+           (color (if (< size 10000000) ; 10m
+                      (doom-blend "orange" "green" (max 0.0 (min 1.0 size-index)))
+                    (let ((large-index (/ (- (log (+ 1.0 size)) 16.118) 4.605)))
+                      (doom-blend "red" "orange" (max 0.0 (min 1.0 large-index)))))))
+      (propertize (file-size-human-readable size) 'face (list :foreground color)))))
 
 
 (setq +zen-text-scale 1.0
@@ -266,26 +280,26 @@ Also immediately enables `mixed-pitch-modes' if currently in one of the modes."
 ;;     '(misc-info matches major-mode process vcs))
 ;;   )
 
-;; (after! orderless
-;;   (defvar my-orderless-accent-replacements
-;;     '(("a" . "[aàáâãäå]")
-;;       ("e" . "[eèéêë]")
-;;       ("i" . "[iìíîï]")
-;;       ("o" . "[oòóôõöœ]")
-;;       ("u" . "[uùúûü]")
-;;       ("c" . "[cç]")
-;;       ("n" . "[nñ]")) ; in case anyone needs ñ for Spanish
+(after! orderless
+  (defvar my-orderless-accent-replacements
+    '(("a" . "[aàáâãäå]")
+      ("e" . "[eèéêë]")
+      ("i" . "[iìíîï]")
+      ("o" . "[oòóôõöœ]")
+      ("u" . "[uùúûü]")
+      ("c" . "[cç]")
+      ("n" . "[nñ]"))) ; in case anyone needs ñ for Spanish
 
-;;     (defun my-orderless-accent-dispatch (pattern &rest _)
-;;       (seq-reduce
-;;        (lambda (prev val)
-;;          (replace-regexp-in-string (car val) (cdr val) prev))
-;;        my-orderless-accent-replacements
-;;        pattern)))
+  (defun my-orderless-accent-dispatch (pattern &rest _)
+    (seq-reduce
+     (lambda (prev val)
+       (replace-regexp-in-string (car val) (cdr val) prev))
+     my-orderless-accent-replacements
+     pattern))
 
-;;   (setq completion-styles '(orderless basic)
-;;         completion-category-overrides '((file (styles basic partial-completion)))
-;;         orderless-style-dispatchers '(my-orderless-accent-dispatch orderless-affix-dispatch)))
+  (setq completion-styles '(orderless basic)
+        completion-category-overrides '((file (styles basic partial-completion)))
+        orderless-style-dispatchers '(my-orderless-accent-dispatch orderless-affix-dispatch)))
 
 
 (provide 'setup-theme-lambda)
