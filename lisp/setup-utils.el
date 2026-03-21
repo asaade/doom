@@ -210,7 +210,7 @@ The DWIM behaviour of this command is as follows:
            (save-match-data
              (looking-at "^#!"))))
        (not (file-executable-p buffer-file-name))
-       (shell-command (concat "chmod +x " buffer-file-name))
+       (shell-command (concat "chmod +x " (shell-quote-argument buffer-file-name)))
        (message
         (concat "Saved as script: " buffer-file-name))))
 
