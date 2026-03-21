@@ -308,9 +308,9 @@ for a given file or set of files. This function makes an intelligent guess."
              (ext (file-name-extension file))
              (initial
               (if (member ext '("png" "jpg" "gif"))
-                  ;;(concat "open -a seashore " (car files))
+                  ;;(concat "open -a seashore " (shell-quote-argument (car files)))
                   ;; TODO: fix. This works for macos but not other platforms.
-                  (concat "open -a preview " (car files))
+                  (concat "open -a preview " (shell-quote-argument (car files)))
                 "")))
         (read-shell-command prompt initial))
 
