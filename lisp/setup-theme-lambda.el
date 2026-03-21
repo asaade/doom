@@ -52,15 +52,13 @@
        (t 'normal)))
 
 ;; calculate the font size based on display-pixel-height
-(setq resolution-factor (eval (/ (display-pixel-height) 1080.0)))
-(setq doom-font (font-spec :family user-font :weight user-font-weight :size (eval (round (* 18 resolution-factor))))
-      doom-big-font (font-spec :family user-font :weight user-font-weight :size (eval (round (* 28 resolution-factor))))
-      doom-variable-pitch-font (font-spec :family variable-font :weight user-font-weight :size (eval (round (* 20 resolution-factor))))
-      doom-symbol-font (font-spec :family symbols-font  :size (eval (round (* 20 resolution-factor))))
-      doom-modeline-height (eval (round (* 30 resolution-factor))))
+(setq resolution-factor (/ (display-pixel-height) 1080.0))
+(setq doom-font (font-spec :family user-font :weight user-font-weight :size (round (* 18 resolution-factor)))
+      doom-big-font (font-spec :family user-font :weight user-font-weight :size (round (* 28 resolution-factor)))
+      doom-variable-pitch-font (font-spec :family variable-font :weight user-font-weight :size (round (* 20 resolution-factor)))
+      doom-symbol-font (font-spec :family symbols-font  :size (round (* 20 resolution-factor)))
+      doom-modeline-height (round (* 30 resolution-factor)))
 (setq doom-font-increment 1)
-
-(setq variable-pitch-serif-font doom-variable-pitch-font)
 
 (setq default-frame-alist
       (append (list
@@ -73,9 +71,9 @@
                '(left-fringe    . 20)
                '(right-fringe   . 20)
                '(tool-bar-lines . 0)
-               '(menu-bar-lines . 0))))
+               '(menu-bar-lines . 0))
+              default-frame-alist))
 
-(setq x-underline-at-descent-line t)
 (setq window-divider-default-right-width 3)
 (setq window-divider-default-places 'right-only)
 (window-divider-mode 1)
@@ -127,9 +125,7 @@
   "A variable-pitch face with serifs."
   :group 'basic-faces)
 
-(setq! variable-pitch-serif-font (font-spec :family "Alegreya" :size 26))
-
-(defcustom variable-pitch-serif-font (font-spec :family "serif")
+(defcustom variable-pitch-serif-font (font-spec :family "Alegreya" :size 26)
   "The font face used for `variable-pitch-serif'."
   :group 'basic-faces
   :type '(restricted-sexp :tag "font-spec" :match-alternatives (fontp))
@@ -251,7 +247,7 @@ Also immediately enables `mixed-pitch-modes' if currently in one of the modes."
 ;;   (defun doom-modeline-update-pdf-pages ()
 ;;     "Update PDF pages."
 ;;     (setq doom-modeline--pdf-pages
-;;           (let ((current-page-str (number-to-string (eval `(pdf-view-current-page))))
+;;           (let ((current-page-str (number-to-string (pdf-view-current-page)))
 ;;                 (total-page-str (number-to-string (pdf-cache-number-of-pages))))
 ;;             (concat
 ;;              (propertize
