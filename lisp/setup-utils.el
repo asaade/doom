@@ -65,7 +65,7 @@ Saves to a temp file and puts the filename in the kill ring."
 (global-set-key (kbd "C-c u") #'screenshot-svg)
 
 (defun insert-current-date () (interactive)
-       (insert (shell-command-to-string "echo -n $(date +%Y-%m-%d)")))
+       (insert (format-time-string "%Y-%m-%d")))
 
 
 (defun insdate-insert-current-date (&optional omit-day-of-week-p)
@@ -192,16 +192,6 @@ The DWIM behaviour of this command is as follows:
 ;;     (define-key map (kbd "M-# b") #'substitute-target-in-buffer)))
 
 
-(defun full-auto-save ()
-  (interactive)
-  (save-excursion
-    (dolist (buf (buffer-list))
-      (set-buffer buf)
-      (if (and (buffer-file-name) (buffer-modified-p))
-          (basic-save-buffer)))))
-(add-hook 'auto-save-hook 'full-auto-save)
-
-
 (defun ash/save-shebanged-file-as-executable ()
   (and (save-excursion
          (save-restriction
@@ -210,7 +200,7 @@ The DWIM behaviour of this command is as follows:
            (save-match-data
              (looking-at "^#!"))))
        (not (file-executable-p buffer-file-name))
-       (shell-command (concat "chmod +x " buffer-file-name))
+       (shell-command (concat "chmod +x " (shell-quote-argument buffer-file-name)))
        (message
         (concat "Saved as script: " buffer-file-name))))
 
