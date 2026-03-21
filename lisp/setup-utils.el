@@ -357,11 +357,6 @@ With a prefix ARG always prompt for command to use."
 ;;   :host "localhost:8000"                ;Llama.cpp server location
 ;;   :models '(test))                    ;Any names, doesn't matter for Llama
 
-;; (defmacro my-insert-unicode (unicode-name)
-;;   `(lambda () (interactive)
-;;      (insert-char (cdr (assoc-string ,unicode-name (ucs-names))))))
-
-;; (bind-key "C-x 8 s" (my-insert-unicode "ZERO WIDTH SPACE"))
 
 ;; https://blog.kaorubb.org/en/posts/gpt-mcp-setup/
 ;; (use-package! gptel
