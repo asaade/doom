@@ -150,8 +150,7 @@ holding export options."
      ;; address
      (let ((address (org-export-data (plist-get info :address) info)))
        (when (org-string-nw-p address)
-         (format "\\address{%s}\n" (mapconcat (lambda (line)
-                                                (format "%s" line))
+         (format "\\address{%s}\n" (mapconcat #'identity
                                               (split-string address "\n") " -- "))))
      ;; email
      (let ((email (and (plist-get info :with-email)
