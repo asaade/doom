@@ -11,19 +11,8 @@
 ;;; For performance
 (setq read-process-output-max (* 1024 1024)) ;; 1mb
 
-(setq gc-cons-threshold most-positive-fixnum
-      gc-cons-percentage 0.6)
-
-(add-hook 'after-init-hook #'(lambda ()
-                               ;; restore after startup
-                               (setq gc-cons-threshold 800000)))
-
 (setq comp-deferred-compilation t)
 (setq comp-async-jobs-number 6)
-
-;; Garbage collector optimization
-(setq gcmh-idle-delay 5)
-(setq gcmh-high-cons-threshold (* 1024 1024 1024))
 
 ;; Version control optimization
 (setq vc-handled-backends '(Git))

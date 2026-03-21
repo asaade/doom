@@ -306,11 +306,13 @@ for a given file or set of files. This function makes an intelligent guess."
       (let* ((file (car files))
              (prompt (concat "! on " file " "))
              (ext (file-name-extension file))
+             (open-cmd (cond ((eq system-type 'darwin) "open")
+                             ((eq system-type 'gnu/linux) "xdg-open")
+                             ((eq system-type 'windows-nt) "start")
+                             (t "open")))
              (initial
-              (if (member ext '("png" "jpg" "gif"))
-                  ;;(concat "open -a seashore " (shell-quote-argument (car files)))
-                  ;; TODO: fix. This works for macos but not other platforms.
-                  (concat "open -a preview " (shell-quote-argument (car files)))
+              (if (member ext '("png" "jpg" "gif" "pdf" "mp4" "webm"))
+                  (concat open-cmd " " (shell-quote-argument (car files)))
                 "")))
         (read-shell-command prompt initial))
 
