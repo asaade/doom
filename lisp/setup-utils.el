@@ -301,12 +301,6 @@ With a prefix ARG always prompt for command to use."
     (error (message "Invalid expression")
            (insert (current-kill 0)))))
 
-;; (defun goto-last-modification ()
-;;   (interactive)
-;;   (undo-fu-only-undo)
-;;   (undo-fu-only-redo))
-
-;; (global-set-key (kbd "M-B") 'goto-last-modification)
 
 (use-package! iedit)
 
