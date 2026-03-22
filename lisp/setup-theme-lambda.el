@@ -28,7 +28,11 @@
              (lambda ()
                (my/apply-theme 'dark)))
 
-;;;(my/apply-theme 'dark)
+;; Apply theme based on current time on startup
+(let ((hour (string-to-number (format-time-string "%H"))))
+  (if (and (>= hour 7) (< hour 18))
+      (my/apply-theme 'light)
+    (my/apply-theme 'dark)))
 
 (set-default 'cursor-type  '(bar . 2))
 (blink-cursor-mode 1)
@@ -39,12 +43,9 @@
 ;; Underline line at descent position, not baseline position
 (setq x-underline-at-descent-line t)
 
-(setq ;; user-font "iMWritingMono Nerd Font Mono"
- ;;user-font "Source Code Pro"
- ;; variable-font "Iosevka Aile"
- user-font "SF Mono"
- variable-font "SF Pro Text"
- symbols-font "Symbola")
+(setq user-font "SF Mono"
+      variable-font "SF Pro Text"
+      symbols-font "Symbola")
 
 (setq user-font-weight
       (cond
@@ -62,22 +63,18 @@
 
 (setq default-frame-alist
       (append (list
-               ;; '(min-height . 1)
-               ;; '(height     . 35)
-               ;; '(min-width  . 1)
-               ;; '(width      . 81)
                '(vertical-scroll-bars . nil)
                '(internal-border-width . 4)
                '(left-fringe    . 20)
                '(right-fringe   . 20)
                '(tool-bar-lines . 0)
-               '(menu-bar-lines . 0))
+               '(menu-bar-lines . 0)
+               '(fullscreen . maximized))
               default-frame-alist))
 
 (setq window-divider-default-right-width 3)
 (setq window-divider-default-places 'right-only)
 (window-divider-mode 1)
-;; (setq widget-image-enable t)
 
 (after! doom-modeline
   (setq doom-modeline-buffer-file-name-style 'relative-to-project ;; 'truncate-with-project
@@ -94,13 +91,13 @@
 (display-battery-mode t)
 
 (custom-set-faces!
-  '(font-lock-comment-face :slant italic :family "Courier New")
-  '(font-lock-keyword-face :slant italic :family "Courier New")
-  '(org-drawer :height 0.9 :slant italic :family "Courier New")
-  '(org-meta-line :height 0.9 :slant italic :family "Courier New")
-  '(org-table :height 0.9 :family "Courier New")
-  '(org-block :height 0.9 :family "Courier New")
-  '(org-code  :height 0.9 :family "Courier New"))
+  '(font-lock-comment-face :slant italic)
+  '(font-lock-keyword-face :slant italic)
+  '(org-drawer :height 0.9 :slant italic)
+  '(org-meta-line :height 0.9 :slant italic)
+  '(org-table :height 0.9)
+  '(org-block :height 0.9)
+  '(org-code  :height 0.9))
 
 (custom-set-faces!
   '(outline-1 :height 1.4  :weight medium)
@@ -108,12 +105,6 @@
   '(outline-3 :height 1.1  :weight medium)
   '(outline-4 :height 1.0  :weight medium)
   '(org-document-title :height 1.6 :weight light :underline nil))
-
-;; (font-lock-add-keywords 'org-mode
-;;                         '(("^\\(?:[  ]*\\)\\(?:[-+]\\|[ ]+\\*\\|\\(?:[0-9]+\\|[A-Za-z]\\)[.)]\\)?[ ]+"
-;;                            . 'fixed-pitch)))
-;; (font-lock-add-keywords 'org-mode '(("(\\?)" . 'error)))
-;; )
 
 
 (custom-set-faces! '((corfu-popupinfo) :height 0.8))
@@ -236,49 +227,7 @@ Also immediately enables `mixed-pitch-modes' if currently in one of the modes."
 
   (setq-default typopunct-buffer-language 'spanish))
 
-;; (ash/pretty)
 (add-hook! 'org-mode-hook :append #'ash/pretty)
-
-(add-to-list 'default-frame-alist '(fullscreen . maximized))
-
-;; (after! doom-modeline
-;;   (doom-modeline-def-segment buffer-name
-;;     "Display the current buffer's name, without any other information."
-;;     (concat
-;;      (doom-modeline-spc)
-;;      (doom-modeline--buffer-name)))
-
-;;   (doom-modeline-def-segment pdf-icon
-;;     "PDF icon from nerd-icons."
-;;     (concat
-;;      (doom-modeline-icon sucicon "nf-seti-pdf" nil nil
-;;                          (doom-modeline-spc)
-;;                          :face (if (doom-modeline--active)
-;;                                    'nerd-icons-red
-;;                                  'mode-line-inactive)
-;;                          :v-adjust 0.02)))
-
-;;   (defun doom-modeline-update-pdf-pages ()
-;;     "Update PDF pages."
-;;     (setq doom-modeline--pdf-pages
-;;           (let ((current-page-str (number-to-string (pdf-view-current-page)))
-;;                 (total-page-str (number-to-string (pdf-cache-number-of-pages))))
-;;             (concat
-;;              (propertize
-;;               (concat (make-string (- (length total-page-str) (length current-page-str)) ? )
-;;                       " P" current-page-str)
-;;               'face 'mode-line)
-;;              (propertize (concat "/" total-page-str) 'face 'doom-modeline-buffer-minor-mode)))))
-
-;;   (doom-modeline-def-segment pdf-pages
-;;     "Display PDF pages."
-;;     (if (doom-modeline--active) doom-modeline--pdf-pages
-;;       (propertize doom-modeline--pdf-pages 'face 'mode-line-inactive)))
-
-;;   (doom-modeline-def-modeline 'pdf
-;;     '(bar window-number pdf-pages pdf-icon buffer-name)
-;;     '(misc-info matches major-mode process vcs))
-;;   )
 
 (after! orderless
   (defvar my-orderless-accent-replacements
