@@ -49,7 +49,7 @@
 
 (setq user-font-weight
       (cond
-       ((string= user-font "Source Code Pro") 'regular)
+       ((string= user-font "SF Mono") 'regular)
        (t 'normal)))
 
 ;; calculate the font size based on display-pixel-height
@@ -249,7 +249,6 @@ Also immediately enables `mixed-pitch-modes' if currently in one of the modes."
   (setq completion-styles '(orderless basic)
         completion-category-overrides '((file (styles basic partial-completion)))
         orderless-style-dispatchers '(my-orderless-accent-dispatch orderless-affix-dispatch)))
-
 
 (provide 'setup-theme-lambda)
 ;;; setup-theme-lambda.el ends here
