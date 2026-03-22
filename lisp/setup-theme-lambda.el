@@ -72,7 +72,7 @@
                '(fullscreen . maximized))
               default-frame-alist))
 
-(setq window-divider-default-right-width 3)
+(setq window-divider-default-right-width 4)
 (setq window-divider-default-places 'right-only)
 (window-divider-mode 1)
 
@@ -82,10 +82,10 @@
         doom-modeline-enable-word-count t
         doom-modeline-hud t
         doom-modeline-time-icon nil
-        doom-modeline-window-width-limit (- fill-column 30)
+        doom-modeline-window-width-limit 85
         inhibit-compacting-font-caches t))
 
-(setq display-time-format "%H:%M"
+(setq display-time-format "%H:%M  "
       display-time-default-load-average nil)
 (display-time-mode t)
 (display-battery-mode t)
@@ -99,12 +99,12 @@
   '(org-block :height 0.9)
   '(org-code  :height 0.9))
 
-(custom-set-faces!
-  '(outline-1 :height 1.4  :weight medium)
-  '(outline-2 :height 1.2  :weight medium)
-  '(outline-3 :height 1.1  :weight medium)
-  '(outline-4 :height 1.0  :weight medium)
-  '(org-document-title :height 1.6 :weight light :underline nil))
+;; (custom-set-faces!
+;;   '(outline-1 :height 1.4  :weight medium)
+;;   '(outline-2 :height 1.2  :weight medium)
+;;   '(outline-3 :height 1.1  :weight medium)
+;;   '(outline-4 :height 1.0  :weight medium)
+;;   '(org-document-title :height 1.6 :weight light :underline nil))
 
 
 (custom-set-faces! '((corfu-popupinfo) :height 0.8))
