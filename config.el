@@ -81,7 +81,7 @@
 
 (load! "./lisp/setup-config")
 (load! "./lisp/setup-yas")
-(load! "./lisp/setup-theme-lambda")
+(load! "./lisp/setup-theme-modern")
 ;;(load! "./lisp/setup-theme-nano")
 (load! "./lisp/setup-utils")
 (load! "./lisp/dired-fixups")
