@@ -66,15 +66,22 @@
 ;; ---------------------------------------------------------------------------
 ;; 3. Themes (Day / Night Auto-Switch)
 ;; ---------------------------------------------------------------------------
-;; We use doom-tokyo-night (dark) and doom-nord-light (light) for a modern feel.
-;; Ensure you have `(package! doom-themes)` in packages.el (standard in Doom).
+;; We use alabaster (light) and lambda-dark (dark) for a high-contrast,
+;; minimal-color approach, reducing cognitive load during coding.
+
+(use-package! alabaster-themes)
+(use-package! lambda-themes
+  :custom
+  (lambda-themes-set-italic-comments t)
+  (lambda-themes-set-italic-keywords t)
+  (lambda-themes-set-variable-pitch t))
 
 (defun my/apply-modern-theme (appearance)
-  "Load a modern theme, based on system APPEARANCE (light or dark)."
+  "Load a high-contrast, low-color theme, based on system APPEARANCE."
   (mapc #'disable-theme custom-enabled-themes)
   (pcase appearance
-    ('light (load-theme 'doom-nord-light :no-confirm) t)
-    ('dark  (load-theme 'doom-tokyo-night :no-confirm) t)))
+    ('light (load-theme 'alabaster-themes-light :no-confirm) t)
+    ('dark  (load-theme 'lambda-dark :no-confirm) t)))
 
 ;; Switch at specific times
 (run-at-time "07:00" (* 60 60 24) (lambda () (my/apply-modern-theme 'light)))
