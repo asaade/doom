@@ -254,6 +254,7 @@ This is used as :override advice on `org-activate-footnote-links'."
 
 (setq org-latex-default-table-environment "longtable"
       org-latex-remove-logfiles t
+      org-latex-compiler "lualatex"
       ;; org-latex-pdf-process (list "texliveonfly.py %f"))
       org-latex-pdf-process (list "latexmk -pdflatex='lualatex -synctex=1 -shell-escape -interaction nonstopmode' -shell-escape -pdf -bibtex -f -output-directory=%o %f"))
 
@@ -328,7 +329,7 @@ This is used as :override advice on `org-activate-footnote-links'."
                  ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 
   (add-to-list 'org-latex-classes
-               '("koma-article" "\\documentclass[11pt]{scrartcl}"
+               '("koma-article" "\\documentclass[11pt,paper=letter]{scrartcl}"
                  ("\\section{%s}" . "\\section*{%s}")
                  ("\\subsection{%s}" . "\\subsection*{%s}")
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
@@ -336,7 +337,7 @@ This is used as :override advice on `org-activate-footnote-links'."
                  ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 
   (add-to-list 'org-latex-classes
-               '("koma-report" "\\documentclass[11pt]{scrreprt}"
+               '("koma-report" "\\documentclass[11pt,paper=letter]{scrreprt}"
                  ("\\part{%s}" . "\\part*{%s}")
                  ("\\chapter{%s}" . "\\chapter*{%s}")
                  ("\\section{%s}" . "\\section*{%s}")
@@ -344,7 +345,7 @@ This is used as :override advice on `org-activate-footnote-links'."
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
 
   (add-to-list 'org-latex-classes
-               '("koma-book" "\\documentclass[11pt]{scrbook}"
+               '("koma-book" "\\documentclass[11pt,paper=letter]{scrbook}"
                  ("\\part{%s}" . "\\part*{%s}")
                  ("\\chapter{%s}" . "\\chapter*{%s}")
                  ("\\section{%s}" . "\\section*{%s}")
@@ -460,7 +461,7 @@ This is used as :override advice on `org-activate-footnote-links'."
 
   (add-to-list 'org-latex-classes
                '("springer-enhanced"
-                 "\\documentclass[graybox,envcountchap,sectrefs]{SVMonoEnhanced}
+                 "\\documentclass[letter,graybox,envcountchap,sectrefs]{SVMonoEnhanced}
                 [PACKAGES]"
                  ("\\chapter{%s}" . "\\chapter*{%s}")
                  ("\\section{%s}" . "\\section*{%s}")
