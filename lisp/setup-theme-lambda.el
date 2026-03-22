@@ -202,7 +202,7 @@ Also immediately enables `mixed-pitch-modes' if currently in one of the modes."
       (propertize (file-size-human-readable size) 'face (list :foreground color)))))
 
 
-(setq +zen-text-scale 1.0
+(setq +zen-text-scale 0.9
       writeroom-width 65
       ;; writeroom-mode-line t
       writeroom-extra-line-spacing 0.1)

@@ -17,11 +17,6 @@
 ;; Version control optimization
 (setq vc-handled-backends '(Git))
 
-;; Fix x11 issues
-;; (setq x-no-window-manager t)
-;; (setq frame-inhibit-implied-resize t)
-;; (setq focus-follows-mouse nil)
-
 ;; Do not load outdated byte code files.
 (setq load-prefer-newer t)
 
@@ -90,7 +85,7 @@
 ;;(load! "./lisp/setup-theme-nano")
 (load! "./lisp/setup-utils")
 (load! "./lisp/dired-fixups")
-;;(load! "./lisp/setup-multimedia.el")
+(load! "./lisp/setup-multimedia.el")
 
 
 

@@ -62,19 +62,19 @@
       org-return-follows-link t
       org-special-ctrl-a/e t
       org-special-ctrl-k t
-      org-src-preserve-indentation t
+      ;; org-src-preserve-indentation t
       org-src-tab-acts-natively t
       org-src-window-setup 'current-window
       org-startup-folded 'content
-      org-startup-indented nil
-      org-tags-column 0
+      org-startup-indented t
+      ;; org-tags-column 0
       org-fontify-emphasized-text t
       org-src-fontify-natively t
       org-catch-invisible-edits 'error
-      org-cycle-separator-lines 2
+      ;; org-cycle-separator-lines 2
       org-image-actual-width 480
-      org-hide-emphasis-markers t)
-
+      ;; org-hide-emphasis-markers t)
+      )
 
 ;; Numbered equations all have (1) as the number for fragments with vanilla
 ;; org-mode. This code injects the correct numbers into the previews so they
@@ -219,7 +219,6 @@ This is used as :override advice on `org-activate-footnote-links'."
         org-re-reveal-transition "slide"
         org-re-reveal-plugins '(markdown notes math search zoom)))
 
-
 (setq org-babel-default-header-args:R
       '((:session . "*my session-r*")
         (:results . "value replace")
@@ -253,14 +252,12 @@ This is used as :override advice on `org-activate-footnote-links'."
         (:tangle . "no")
         (:comments . "link")))
 
-
 (setq org-latex-default-table-environment "longtable"
       org-latex-remove-logfiles t
       ;; org-latex-pdf-process (list "texliveonfly.py %f"))
       org-latex-pdf-process (list "latexmk -pdflatex='lualatex -synctex=1 -shell-escape -interaction nonstopmode' -shell-escape -pdf -bibtex -f -output-directory=%o %f"))
 
 (setq org-preview-latex-default-process 'dvisvgm)
-
 
 ;; https://github.com/emacsmirror/org-contrib
 (use-package! ox-extra
@@ -488,12 +485,7 @@ This is used as :override advice on `org-activate-footnote-links'."
   (defun deploy-saade-me ()
     "Publish all Org files in a directory."
     (interactive)
-    (start-process-shell-command "publish" nil "~/.bin/deploy-saade.me.sh"))
-
-  (defun deploy-saade-net ()
-    "Publish all Org files in a directory."
-    (interactive)
-    (start-process-shell-command "publish" nil "~/.bin/deploy-saade.tufte.sh")))
+    (start-process-shell-command "publish" nil "~/.bin/deploy-saade.me.sh")))
 
 ;; Org-roam Templates
 (setq org-roam-capture-templates
@@ -673,7 +665,7 @@ This is used as :override advice on `org-activate-footnote-links'."
             #'adviced:org-yank)
 
 (setopt global-corfu-modes
-      '((not erc-mode circe-mode help-mode gud-mode vterm-mode org-mode markdown-mode text-mode) t))
+        '((not erc-mode circe-mode help-mode gud-mode vterm-mode org-mode markdown-mode text-mode) t))
 
 (setq org-use-speed-commands
       (lambda ()

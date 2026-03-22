@@ -33,7 +33,8 @@
      "1a6d120936f9df3f44953124dbf9e56b399e021702ca7d1844e6c5e1658b692b"
      "1f8bd4db8280d5e7c5e6a12786685a7e0c6733b0e3cf99f839fb211236fb4529"
      "f1e8339b04aef8f145dd4782d03499d9d716fdc0361319411ac2efc603249326" default))
- '(package-selected-packages nil))
+ '(package-selected-packages nil)
+ '(safe-local-variable-values '((org-hugo-base-dir . "~/dev/blogs/saade.me"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
