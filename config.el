@@ -64,6 +64,21 @@
 (setq byte-compile-warnings '(not free-vars unresolved))
 (setq flycheck-emacs-lisp-load-path 'inherit)
 
+(after! flycheck
+  (defun my/flycheck-emacs-lisp-filter (errors)
+    "Filter out 'assignment to free variable' and 'reference to free variable' warnings."
+    (seq-remove (lambda (err)
+                  (let ((msg (flycheck-error-message err)))
+                    (or (string-match-p "assignment to free variable" msg)
+                        (string-match-p "reference to free variable" msg)
+                        (string-match-p "the function .* is not known to be defined" msg))))
+                errors))
+
+  (defun my/apply-flycheck-filter-h ()
+    (setq-local flycheck-checker-error-filter #'my/flycheck-emacs-lisp-filter))
+
+  (add-hook 'emacs-lisp-mode-hook #'my/apply-flycheck-filter-h))
+
 ;; Make native compilation silent and prune its cache.
 (when (native-comp-available-p)
   (setq native-comp-async-report-warnings-errors 'silent) ; Emacs 28 with native compilation
