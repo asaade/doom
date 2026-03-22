@@ -503,6 +503,25 @@ This is used as :override advice on `org-activate-footnote-links'."
                  ("\\subsection{%s}" . "\\subsection*{%s}")
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
 
+
+  ;; Language and localization settings for Spanish (Mexico)
+  ;; `t` means included in LaTeX preview snippets.
+  (add-to-list 'org-latex-packages-alist '("spanish,es-tabla,es-noindentfirst,es-lcroman" "babel" t))
+  (add-to-list 'org-latex-packages-alist '("spanish=mexican" "csquotes" t))
+  (add-to-list 'org-latex-packages-alist '("" "shapepar" t))
+
+  ;; Custom Hyperref Template incorporating `hidelinks` and dynamic Org properties
+  (setq org-latex-hyperref-template
+        "\\hypersetup{
+ pdfauthor={%a},
+ pdftitle={%t},
+ pdfkeywords={%k},
+ pdfsubject={%d},
+ pdfcreator={%c},
+ pdflang={%L},
+ hidelinks}
+")
+
   (setq org-latex-default-class "koma-article")
   )
 
