@@ -82,10 +82,10 @@
         doom-modeline-enable-word-count t
         doom-modeline-hud t
         doom-modeline-time-icon nil
-        doom-modeline-window-width-limit (- fill-column 30)
+        doom-modeline-window-width-limit 85
         inhibit-compacting-font-caches t))
 
-(setq display-time-format "%H:%M"
+(setq display-time-format "%H:%M "
       display-time-default-load-average nil)
 (display-time-mode t)
 (display-battery-mode t)
