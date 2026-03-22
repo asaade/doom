@@ -239,16 +239,18 @@ Also immediately enables `mixed-pitch-modes' if currently in one of the modes."
       ("c" . "[cç]")
       ("n" . "[nñ]"))) ; in case anyone needs ñ for Spanish
 
-  (defun my-orderless-accent-dispatch (pattern &rest _)
-    (seq-reduce
-     (lambda (prev val)
-       (replace-regexp-in-string (car val) (cdr val) prev))
-     my-orderless-accent-replacements
-     pattern))
+  (defun my-orderless-accent-regexp (component)
+    "Match COMPONENT as a regexp, but ignoring accents."
+    (let ((res (seq-reduce
+                (lambda (prev val)
+                  (replace-regexp-in-string (car val) (cdr val) prev))
+                my-orderless-accent-replacements
+                component)))
+      (orderless-regexp res)))
 
   (setq completion-styles '(orderless basic)
-        completion-category-overrides '((file (styles basic partial-completion)))
-        orderless-style-dispatchers '(my-orderless-accent-dispatch orderless-affix-dispatch)))
+        completion-category-overrides '((file (styles basic partial-completion))))
+  (add-to-list 'orderless-matching-styles 'my-orderless-accent-regexp))
 
 (provide 'setup-theme-lambda)
 ;;; setup-theme-lambda.el ends here
