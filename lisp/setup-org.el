@@ -317,7 +317,7 @@ This is used as :override advice on `org-activate-footnote-links'."
   :after (citar org-roam)
   :config (citar-org-roam-mode))
 
-(after! ox
+(after! ox-latex
   ;; Add KOMA-scripts classes to org export
   (add-to-list 'org-latex-classes
                '("koma-letter" "\\documentclass[paper=letter]{scrletter}"
@@ -467,7 +467,7 @@ This is used as :override advice on `org-activate-footnote-links'."
                  ("\\subsection{%s}" . "\\subsection*{%s}")
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
 
-  ;;(setq org-latex-default-class "koma-article")
+  (setq org-latex-default-class "koma-article")
   )
 
 ;; Hugo Export Functions
