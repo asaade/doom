@@ -321,7 +321,11 @@ This is used as :override advice on `org-activate-footnote-links'."
 (after! ox-latex
   ;; Add KOMA-scripts classes to org export
   (add-to-list 'org-latex-classes
-               '("koma-letter" "\\documentclass[paper=letter]{scrletter}"
+               '("koma-letter" "\\documentclass[paper=letter]{scrletter}
+[DEFAULT-PACKAGES]
+[PACKAGES]
+[EXTRA]
+"
                  ("\\section{%s}" . "\\section*{%s}")
                  ("\\subsection{%s}" . "\\subsection*{%s}")
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
@@ -329,7 +333,11 @@ This is used as :override advice on `org-activate-footnote-links'."
                  ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 
   (add-to-list 'org-latex-classes
-               '("koma-article" "\\documentclass[11pt,paper=letter]{scrartcl}"
+               '("koma-article" "\\documentclass[11pt,paper=letter]{scrartcl}
+[DEFAULT-PACKAGES]
+[PACKAGES]
+[EXTRA]
+"
                  ("\\section{%s}" . "\\section*{%s}")
                  ("\\subsection{%s}" . "\\subsection*{%s}")
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
@@ -337,7 +345,11 @@ This is used as :override advice on `org-activate-footnote-links'."
                  ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 
   (add-to-list 'org-latex-classes
-               '("koma-report" "\\documentclass[11pt,paper=letter]{scrreprt}"
+               '("koma-report" "\\documentclass[11pt,paper=letter]{scrreprt}
+[DEFAULT-PACKAGES]
+[PACKAGES]
+[EXTRA]
+"
                  ("\\part{%s}" . "\\part*{%s}")
                  ("\\chapter{%s}" . "\\chapter*{%s}")
                  ("\\section{%s}" . "\\section*{%s}")
@@ -345,7 +357,11 @@ This is used as :override advice on `org-activate-footnote-links'."
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
 
   (add-to-list 'org-latex-classes
-               '("koma-book" "\\documentclass[11pt,paper=letter]{scrbook}"
+               '("koma-book" "\\documentclass[11pt,paper=letter]{scrbook}
+[DEFAULT-PACKAGES]
+[PACKAGES]
+[EXTRA]
+"
                  ("\\part{%s}" . "\\part*{%s}")
                  ("\\chapter{%s}" . "\\chapter*{%s}")
                  ("\\section{%s}" . "\\section*{%s}")
@@ -360,6 +376,9 @@ This is used as :override advice on `org-activate-footnote-links'."
 \\usepackage[T1]{fontenc}
 \\usepackage{lipsum}
 \\usepackage[parts,eulerchapternumbers=true, style=linedheaders, beramono=false,eulermath=true]{classicthesis}
+[DEFAULT-PACKAGES]
+[PACKAGES]
+[EXTRA]
 "
                  ;; ("\\part{%s}" . "\\part*{%s}")
                  ("\\chapter{%s}" . "\\chapter*{%s}")
@@ -375,6 +394,9 @@ This is used as :override advice on `org-activate-footnote-links'."
 \\usepackage[T1]{fontenc}
 \\usepackage{lipsum}
 \\usepackage[parts,nochapters, style=linedheaders, beramono=false,eulermath=true]{classicthesis}
+[DEFAULT-PACKAGES]
+[PACKAGES]
+[EXTRA]
 "
                  ;; ("\\part{%s}" . "\\part*{%s}")
                  ("\\chapter{%s}" . "\\chapter*{%s}")
@@ -385,7 +407,10 @@ This is used as :override advice on `org-activate-footnote-links'."
   (add-to-list 'org-latex-classes
                '("springer-mono"
                  "\\documentclass[letter,graybox,envcountchap,sectrefs]{svmono}
-                [PACKAGES]"
+[DEFAULT-PACKAGES]
+[PACKAGES]
+[EXTRA]
+"
 
                  ("\\chapter{%s}" . "\\chapter*{%s}")
                  ("\\section{%s}" . "\\section*{%s}")
@@ -395,7 +420,10 @@ This is used as :override advice on `org-activate-footnote-links'."
   (add-to-list 'org-latex-classes
                '("tufte-book"
                  "\\documentclass[letter,graybox,envcountchap,sectrefs]{tufte-book}
-                [PACKAGES]"
+[DEFAULT-PACKAGES]
+[PACKAGES]
+[EXTRA]
+"
 
                  ("\\chapter{%s}" . "\\chapter*{%s}")
                  ("\\section{%s}" . "\\section*{%s}")
@@ -406,10 +434,13 @@ This is used as :override advice on `org-activate-footnote-links'."
                '("springer-modern"
                  "\\documentclass[letter, 10pt, twoside, openright]{book}
                  \\usepackage{modernmono2}
-                [PACKAGES]
-                 \\usepackage{titlesec}
+                                 \\usepackage{titlesec}
                 \\newcommand{\\sectionbreak}{\\clearpage}
-                \\newcommand{\\subsectionbreak}{\\clearpage}"
+                \\newcommand{\\subsectionbreak}{\\clearpage}
+[DEFAULT-PACKAGES]
+[PACKAGES]
+[EXTRA]
+"
 
                  ("\\chapter{%s}" . "\\chapter*{%s}")
                  ("\\section{%s}" . "\\section*{%s}")
@@ -419,7 +450,11 @@ This is used as :override advice on `org-activate-footnote-links'."
   (add-to-list 'org-latex-classes
                '("memoir"
                  "\\documentclass{memoir}
-               \\usepackage[letterpaper, mag=1200, truedimen, width=4.0in, left=2.5in, top=0.8in, bottom=0.8in]{geometry}"
+               \\usepackage[letterpaper, mag=1200, truedimen, width=4.0in, left=2.5in, top=0.8in, bottom=0.8in]{geometry}
+[DEFAULT-PACKAGES]
+[PACKAGES]
+[EXTRA]
+"
                  ("\\chapter{%s}" . "\\chapter*{%s}")
                  ("\\section{%s}" . "\\section*{%s}")
                  ("\\subsection{%s}" . "\\subsection*{%s}")
@@ -443,7 +478,9 @@ This is used as :override advice on `org-activate-footnote-links'."
 \\makeglossaries % Make LaTeX produce the files required to compile the glossary
 % \\input{glossary.tex} % Include the glossary definitions
 \\makenomenclature % Make LaTeX produce the files required to compile the nomenclature
+[DEFAULT-PACKAGES]
 [PACKAGES]
+[EXTRA]
 "
                  ("\\chapter{%s}" . "\\chapter*{%s}")
                  ("\\section{%s}" . "\\section*{%s}")
@@ -453,7 +490,11 @@ This is used as :override advice on `org-activate-footnote-links'."
 
   (add-to-list 'org-latex-classes
                '("springer-report"
-                 "\\documentclass[letter, graybox,envcountchap,sectrefs]{svmono}"
+                 "\\documentclass[letter, graybox,envcountchap,sectrefs]{svmono}
+[DEFAULT-PACKAGES]
+[PACKAGES]
+[EXTRA]
+"
 
                  ("\\chapter{%s}" . "\\section*{%s}")
                  ("\\section{%s}" . "\\subsection*{%s}")
@@ -462,7 +503,10 @@ This is used as :override advice on `org-activate-footnote-links'."
   (add-to-list 'org-latex-classes
                '("springer-enhanced"
                  "\\documentclass[letter,graybox,envcountchap,sectrefs]{SVMonoEnhanced}
-                [PACKAGES]"
+[DEFAULT-PACKAGES]
+[PACKAGES]
+[EXTRA]
+"
                  ("\\chapter{%s}" . "\\chapter*{%s}")
                  ("\\section{%s}" . "\\section*{%s}")
                  ("\\subsection{%s}" . "\\subsection*{%s}")
@@ -474,6 +518,11 @@ This is used as :override advice on `org-activate-footnote-links'."
   (add-to-list 'org-latex-packages-alist '("spanish,es-tabla,es-noindentfirst,es-lcroman" "babel" t))
   (add-to-list 'org-latex-packages-alist '("spanish=mexican" "csquotes" t))
   (add-to-list 'org-latex-packages-alist '("" "shapepar" t))
+
+  ;; Unicode character mapping
+  (add-to-list 'org-latex-packages-alist '("" "pifont" t))
+  (add-to-list 'org-latex-packages-alist '("" "newunicodechar" t))
+  (add-to-list 'org-latex-packages-alist '("\\newunicodechar{✔}{\\ding{51}}" "" t))
 
   ;; Custom Hyperref Template incorporating `hidelinks` and dynamic Org properties
   (setq org-latex-hyperref-template
