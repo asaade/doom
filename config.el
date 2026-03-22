@@ -60,7 +60,9 @@
 (setq ;; auth-sources '("~/.authinfo.gpg")
  auth-source-cache-expiry nil) ; default is 7200 (2h)
 
-(setq byte-compile-warnings '(cl-functions))
+;; Ignore excessive free variable assignment/reference warnings in Flycheck
+(setq byte-compile-warnings '(not free-vars unresolved))
+(setq flycheck-emacs-lisp-load-path 'inherit)
 
 ;; Make native compilation silent and prune its cache.
 (when (native-comp-available-p)
