@@ -21,22 +21,9 @@
 ;; size, in addition to name and timestamp. Use the s key to cycle through
 ;; sort modes.
 
-;; To use it, place something like this in your .emacs file:
-;;
-;; (use-package dired
-;;   :ensure nil
-;;   :config
-;;   (require 'dino-dired-fixups)
-;;   ;; eliminate the gid in dired when using ls-lisp (eg, on windows)
-;;   (setq ls-lisp-verbosity '(links uid)))
-
-
 (require 'dired)
 (require 'dired-aux)
 (require 'ls-lisp)
-
-;; (defun ls-lisp-format-time (file-attr time-index now)
-;;   "################")
 
 (defun dino-dired-available-switches ()
   ;; On MacOS, the builtin ls program does not do the -X option. (lame)
@@ -289,7 +276,6 @@ and quit."
              ;; else, the dired buffer points to a dir that no longer exists
              (let ((zombie-buffer (window-buffer win)))
                (kill-buffer zombie-buffer))))))
-   ;;(condition-case nil (delete-window win) (error nil)))))))
    'no-mini 'all-frames))
 
 (run-with-idle-timer 1 t 'maybe-revert-dired-buffers)
