@@ -265,6 +265,11 @@ This is used as :override advice on `org-activate-footnote-links'."
 
 (setq org-preview-latex-default-process 'dvipng)
 
+(let ((dvipng-config (assq 'dvipng org-preview-latex-process-alist)))
+  (when dvipng-config
+    (plist-put (cdr dvipng-config) :latex-compiler '("lualatex --output-format=dvi -interaction nonstopmode -output-directory %o %f"))))
+
+
 ;; https://github.com/emacsmirror/org-contrib
 (use-package! ox-extra
   :after org
@@ -319,260 +324,74 @@ This is used as :override advice on `org-activate-footnote-links'."
    :prefix "n"
    :desc "Org insert citation" "t" #'citar))
 
-(use-package! citar-org-roam
-  :after (citar org-roam)
-  :config (citar-org-roam-mode))
-
 (after! ox-latex
-  ;; Add KOMA-scripts classes to org export
-  (add-to-list 'org-latex-classes
-               '("koma-letter" "\\documentclass[paper=letter]{scrletter}
-[DEFAULT-PACKAGES]
-[PACKAGES]
-[EXTRA]
-"
-                 ("\\section{%s}" . "\\section*{%s}")
-                 ("\\subsection{%s}" . "\\subsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\paragraph{%s}" . "\\paragraph*{%s}")
-                 ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+  ;; Limpiar configuraciones previas para evitar conflictos
+  (setq org-latex-classes nil)
 
+  ;; 1. KOMA-Script Article (La más recomendada para documentos limpios)
   (add-to-list 'org-latex-classes
                '("koma-article" "\\documentclass[11pt,paper=letter]{scrartcl}
 [DEFAULT-PACKAGES]
 [PACKAGES]
-[EXTRA]
-"
+[EXTRA]"
                  ("\\section{%s}" . "\\section*{%s}")
                  ("\\subsection{%s}" . "\\subsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\paragraph{%s}" . "\\paragraph*{%s}")
-                 ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
 
+  ;; 2. Classic Article (CORREGIDA: Ahora usa scrartcl para evitar "Outline")
+  (add-to-list 'org-latex-classes
+               '("classic-article" "\\RequirePackage{silence}
+    \\WarningFilter{scrartcl}{Usage of package `titlesec'}
+    \\WarningFilter{titlesec}{Non standard sectioning command detected}
+\\documentclass[11pt,letterpaper,footinclude,headinclude,oneside]{scrartcl}
+\\usepackage[nochapters, style=linedheaders, beramono=false,eulermath=true]{classicthesis}
+[DEFAULT-PACKAGES]
+[PACKAGES]
+[EXTRA]"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+
+  ;; 3. KOMA-Script Report (Para documentos largos con capítulos)
   (add-to-list 'org-latex-classes
                '("koma-report" "\\documentclass[11pt,paper=letter]{scrreprt}
 [DEFAULT-PACKAGES]
 [PACKAGES]
-[EXTRA]
-"
-                 ("\\part{%s}" . "\\part*{%s}")
+[EXTRA]"
                  ("\\chapter{%s}" . "\\chapter*{%s}")
                  ("\\section{%s}" . "\\section*{%s}")
-                 ("\\subsection{%s}" . "\\subsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+                 ("\\subsection{%s}" . "\\subsection*{%s}")))
 
+  ;; 4. KOMA-Script Book
   (add-to-list 'org-latex-classes
                '("koma-book" "\\documentclass[11pt,paper=letter]{scrbook}
 [DEFAULT-PACKAGES]
 [PACKAGES]
-[EXTRA]
-"
+[EXTRA]"
                  ("\\part{%s}" . "\\part*{%s}")
                  ("\\chapter{%s}" . "\\chapter*{%s}")
-                 ("\\section{%s}" . "\\section*{%s}")
-                 ("\\subsection{%s}" . "\\subsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+                 ("\\section{%s}" . "\\section*{%s}")))
 
+  ;; 5. Tufte Handout (Estilo elegante con notas al margen)
   (add-to-list 'org-latex-classes
-               '("classic" "\\RequirePackage{silence} % :-\\
-    \\WarningFilter{scrbook}{Usage of package `titlesec'}
-    \\WarningFilter{titlesec}{Non standard sectioning command detected}
-\\documentclass[11pt,letterpaper,footinclude,headinclude,oneside,open=right]{scrbook}
-\\usepackage{lipsum}
-\\usepackage[parts,eulerchapternumbers=true, style=linedheaders, beramono=false,eulermath=true]{classicthesis}
+               '("tufte-handout" "\\documentclass[letterpaper]{tufte-handout}
 [DEFAULT-PACKAGES]
 [PACKAGES]
-[EXTRA]
-"
-                 ;; ("\\part{%s}" . "\\part*{%s}")
-                 ("\\chapter{%s}" . "\\chapter*{%s}")
-                 ("\\section{%s}" . "\\section*{%s}")
-                 ("\\subsection{%s}" . "\\subsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
-
-  (add-to-list 'org-latex-classes
-               '("classic-article" "\\RequirePackage{silence} % :-\\
-    \\WarningFilter{article}{Usage of package `titlesec'}
-    \\WarningFilter{titlesec}{Non standard sectioning command detected}
-\\documentclass[11pt,letterpaper,footinclude,headinclude,oneside,open=right]{article}
-\\usepackage{lipsum}
-\\usepackage[parts,nochapters, style=linedheaders, beramono=false,eulermath=true]{classicthesis}
-[DEFAULT-PACKAGES]
-[PACKAGES]
-[EXTRA]
-"
-                 ("\\section{%s}" . "\\section*{%s}")
-                 ("\\subsection{%s}" . "\\subsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\paragraph{%s}" . "\\paragraph*{%s}")
-                 ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-
-  (add-to-list 'org-latex-classes
-               '("springer-mono"
-                 "\\documentclass[letter,graybox,envcountchap,sectrefs]{svmono}
-[DEFAULT-PACKAGES]
-[PACKAGES]
-[EXTRA]
-"
-
-                 ("\\chapter{%s}" . "\\chapter*{%s}")
-                 ("\\section{%s}" . "\\section*{%s}")
-                 ("\\subsection{%s}" . "\\subsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
-
-  (add-to-list 'org-latex-classes
-               '("tufte-book"
-                 "\\documentclass[letter]{tufte-book}
-[DEFAULT-PACKAGES]
-[PACKAGES]
-[EXTRA]
-"
-
-                 ("\\chapter{%s}" . "\\chapter*{%s}")
-                 ("\\section{%s}" . "\\section*{%s}")
-                 ("\\subsection{%s}" . "\\subsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
-
-  (add-to-list 'org-latex-classes
-               '("springer-modern"
-                 "\\documentclass[letter, 10pt, twoside, openright]{book}
-                 \\usepackage{modernmono2}
-                                 \\usepackage{titlesec}
-                \\newcommand{\\sectionbreak}{\\clearpage}
-                \\newcommand{\\subsectionbreak}{\\clearpage}
-[DEFAULT-PACKAGES]
-[PACKAGES]
-[EXTRA]
-"
-
-                 ("\\chapter{%s}" . "\\chapter*{%s}")
-                 ("\\section{%s}" . "\\section*{%s}")
-                 ("\\subsection{%s}" . "\\subsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
-
-  (add-to-list 'org-latex-classes
-               '("memoir"
-                 "\\documentclass{memoir}
-               \\usepackage[letterpaper, mag=1200, truedimen, width=4.0in, left=2.5in, top=0.8in, bottom=0.8in]{geometry}
-[DEFAULT-PACKAGES]
-[PACKAGES]
-[EXTRA]
-"
-                 ("\\chapter{%s}" . "\\chapter*{%s}")
-                 ("\\section{%s}" . "\\section*{%s}")
-                 ("\\subsection{%s}" . "\\subsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
-
-  (add-to-list 'org-latex-classes
-               '("kao"
-                 "\\documentclass[letter, fontsize=10pt, twoside=false,
-        %open=any, % If twoside=true, uncomment this to force new chapters to start on any page, not only on right (odd) pages
-        %chapterentrydots=true, % Uncomment to output dots from the chapter name to the page number in the table of contents
-        numbers=noenddot, % Comment to output dots after chapter numbers; the most common values for this option are: enddot, noenddot and auto (see the KOMAScript documentation for an in-depth explanation)
-        fontmethod=tex,]{kaobook}
-% Load the bibliography package
-\\usepackage{kaobiblio}
-% Load mathematical packages for theorems and related environments
-\\usepackage[framed=true]{kaotheorems}
-% Load the package for hyperreferences
-\\usepackage{kaorefs}
-\\graphicspath{{static/images/}{images/}} % Paths in which to look for images
-\\makeindex[columns=3, title=Alphabetical Index, intoc] % Make LaTeX produce the files required to compile the index
-\\makeglossaries % Make LaTeX produce the files required to compile the glossary
-% \\input{glossary.tex} % Include the glossary definitions
-\\makenomenclature % Make LaTeX produce the files required to compile the nomenclature
-[DEFAULT-PACKAGES]
-[PACKAGES]
-[EXTRA]
-"
-                 ("\\chapter{%s}" . "\\chapter*{%s}")
-                 ("\\section{%s}" . "\\section*{%s}")
-                 ("\\subsection{%s}" . "\\subsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
-
-
-  (add-to-list 'org-latex-classes
-               '("springer-report"
-                 "\\documentclass[letter, graybox,envcountchap,sectrefs]{svmono}
-[DEFAULT-PACKAGES]
-[PACKAGES]
-[EXTRA]
-"
-
-                 ("\\chapter{%s}" . "\\chapter*{%s}")
-                 ("\\section{%s}" . "\\section*{%s}")
-                 ("\\subsection{%s}" . "\\subsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
-
-  (add-to-list 'org-latex-classes
-               '("springer-enhanced"
-                 "\\documentclass[letter,graybox,envcountchap,sectrefs]{SVMonoEnhanced}
-[DEFAULT-PACKAGES]
-[PACKAGES]
-[EXTRA]
-"
-                 ("\\chapter{%s}" . "\\chapter*{%s}")
-                 ("\\section{%s}" . "\\section*{%s}")
-                 ("\\subsection{%s}" . "\\subsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
-
-
-
-  (add-to-list 'org-latex-classes
-               '("tufte-handout"
-                 "\\documentclass[letterpaper]{tufte-handout}
-[DEFAULT-PACKAGES]
-[PACKAGES]
-[EXTRA]
-"
-                 ("\\section{%s}" . "\\section*{%s}")
-                 ("\\subsection{%s}" . "\\subsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
-
-  (add-to-list 'org-latex-classes
-               '("ieeetran"
-                 "\\documentclass[letterpaper, 10pt, conference]{IEEEtran}
-[DEFAULT-PACKAGES]
-[PACKAGES]
-[EXTRA]
-"
-                 ("\\section{%s}" . "\\section*{%s}")
-                 ("\\subsection{%s}" . "\\subsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\paragraph{%s}" . "\\paragraph*{%s}")))
-
-  (add-to-list 'org-latex-classes
-               '("standalone"
-                 "\\documentclass[crop,tikz,multi=false]{standalone}
-[DEFAULT-PACKAGES]
-[PACKAGES]
-[EXTRA]
-"
+[EXTRA]"
                  ("\\section{%s}" . "\\section*{%s}")
                  ("\\subsection{%s}" . "\\subsection*{%s}")))
 
+  ;; 6. Standalone (Para gráficos o fragmentos aislados)
   (add-to-list 'org-latex-classes
-               '("exam"
-                 "\\documentclass[letterpaper, 11pt, addpoints]{exam}
+               '("standalone" "\\documentclass[crop,tikz,multi=false]{standalone}
 [DEFAULT-PACKAGES]
 [PACKAGES]
-[EXTRA]
-"
+[EXTRA]"
                  ("\\section{%s}" . "\\section*{%s}")
-                 ("\\subsection{%s}" . "\\subsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+                 ("\\subsection{%s}" . "\\subsection*{%s}")))
 
-  (add-to-list 'org-latex-classes
-               '("beamer"
-                 "\\documentclass[presentation,aspectratio=169]{beamer}
-\\usetheme{metropolis}
-[DEFAULT-PACKAGES]
-[PACKAGES]
-[EXTRA]
-"
-                 ("\\section{%s}" . "\\section*{%s}")
-                 ("\\subsection{%s}" . "\\subsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+  ;; Configuración final
+  (setq org-latex-default-class "koma-article")
 
   ;; Language and localization settings for Spanish (Mexico)
   ;; `t` means included in LaTeX preview snippets.
@@ -594,7 +413,8 @@ This is used as :override advice on `org-activate-footnote-links'."
  pdfsubject={%d},
  pdfcreator={%c},
  pdflang={%L},
- hidelinks}
+ hidelinks,
+ %s}
 ")
 
   (setq org-latex-default-class "koma-article")
