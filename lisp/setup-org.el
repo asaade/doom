@@ -265,6 +265,11 @@ This is used as :override advice on `org-activate-footnote-links'."
 
 (setq org-preview-latex-default-process 'dvipng)
 
+(after! org
+  (let ((dvipng-config (assq 'dvipng org-preview-latex-process-alist)))
+    (when dvipng-config
+      (plist-put (cdr dvipng-config) :latex-compiler '("lualatex --output-format=dvi -interaction nonstopmode -output-directory %o %f")))))
+
 ;; https://github.com/emacsmirror/org-contrib
 (use-package! ox-extra
   :after org
