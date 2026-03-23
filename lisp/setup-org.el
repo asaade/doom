@@ -378,7 +378,6 @@ This is used as :override advice on `org-activate-footnote-links'."
     \\WarningFilter{scrbook}{Usage of package `titlesec'}
     \\WarningFilter{titlesec}{Non standard sectioning command detected}
 \\documentclass[11pt,letterpaper,footinclude,headinclude,oneside,open=right]{scrbook}
-\\usepackage[T1]{fontenc}
 \\usepackage{lipsum}
 \\usepackage[parts,eulerchapternumbers=true, style=linedheaders, beramono=false,eulermath=true]{classicthesis}
 [DEFAULT-PACKAGES]
@@ -396,18 +395,17 @@ This is used as :override advice on `org-activate-footnote-links'."
     \\WarningFilter{article}{Usage of package `titlesec'}
     \\WarningFilter{titlesec}{Non standard sectioning command detected}
 \\documentclass[11pt,letterpaper,footinclude,headinclude,oneside,open=right]{article}
-\\usepackage[T1]{fontenc}
 \\usepackage{lipsum}
 \\usepackage[parts,nochapters, style=linedheaders, beramono=false,eulermath=true]{classicthesis}
 [DEFAULT-PACKAGES]
 [PACKAGES]
 [EXTRA]
 "
-                 ;; ("\\part{%s}" . "\\part*{%s}")
-                 ("\\chapter{%s}" . "\\chapter*{%s}")
                  ("\\section{%s}" . "\\section*{%s}")
                  ("\\subsection{%s}" . "\\subsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                 ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 
   (add-to-list 'org-latex-classes
                '("springer-mono"
@@ -424,7 +422,7 @@ This is used as :override advice on `org-activate-footnote-links'."
 
   (add-to-list 'org-latex-classes
                '("tufte-book"
-                 "\\documentclass[letter,graybox,envcountchap,sectrefs]{tufte-book}
+                 "\\documentclass[letter]{tufte-book}
 [DEFAULT-PACKAGES]
 [PACKAGES]
 [EXTRA]
@@ -501,9 +499,10 @@ This is used as :override advice on `org-activate-footnote-links'."
 [EXTRA]
 "
 
-                 ("\\chapter{%s}" . "\\section*{%s}")
-                 ("\\section{%s}" . "\\subsection*{%s}")
-                 ("\\subsection{%s}" . "\\subsubsection*{%s}")))
+                 ("\\chapter{%s}" . "\\chapter*{%s}")
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
 
   (add-to-list 'org-latex-classes
                '("springer-enhanced"
