@@ -1,5 +1,6 @@
 ;;; $DOOMDIR/packages.el -*- no-byte-compile: t; -*-
 
+(unpin! org)
 
 (package! websocket)
 (package! simple-httpd)
@@ -71,7 +72,6 @@
 (package! backup-walker
   :recipe (:host github
            :repo "lewang/backup-walker"))
-
 
 (package! lambda-themes
   :recipe (:host github
