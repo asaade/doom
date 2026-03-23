@@ -517,6 +517,63 @@ This is used as :override advice on `org-activate-footnote-links'."
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
 
 
+
+  (add-to-list 'org-latex-classes
+               '("tufte-handout"
+                 "\\documentclass[letterpaper]{tufte-handout}
+[DEFAULT-PACKAGES]
+[PACKAGES]
+[EXTRA]
+"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+
+  (add-to-list 'org-latex-classes
+               '("ieeetran"
+                 "\\documentclass[letterpaper, 10pt, conference]{IEEEtran}
+[DEFAULT-PACKAGES]
+[PACKAGES]
+[EXTRA]
+"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\paragraph{%s}" . "\\paragraph*{%s}")))
+
+  (add-to-list 'org-latex-classes
+               '("standalone"
+                 "\\documentclass[crop,tikz,multi=false]{standalone}
+[DEFAULT-PACKAGES]
+[PACKAGES]
+[EXTRA]
+"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")))
+
+  (add-to-list 'org-latex-classes
+               '("exam"
+                 "\\documentclass[letterpaper, 11pt, addpoints]{exam}
+[DEFAULT-PACKAGES]
+[PACKAGES]
+[EXTRA]
+"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+
+  (add-to-list 'org-latex-classes
+               '("beamer"
+                 "\\documentclass[presentation,aspectratio=169]{beamer}
+\\usetheme{metropolis}
+[DEFAULT-PACKAGES]
+[PACKAGES]
+[EXTRA]
+"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+
   ;; Language and localization settings for Spanish (Mexico)
   ;; `t` means included in LaTeX preview snippets.
   (add-to-list 'org-latex-packages-alist '("spanish,es-tabla,es-noindentfirst,es-lcroman" "babel" t))
