@@ -60,7 +60,24 @@
 (setq ;; auth-sources '("~/.authinfo.gpg")
  auth-source-cache-expiry nil) ; default is 7200 (2h)
 
-(setq byte-compile-warnings '(cl-functions))
+;; Ignore excessive free variable assignment/reference warnings in Flycheck
+(setq byte-compile-warnings '(not free-vars unresolved))
+(setq flycheck-emacs-lisp-load-path 'inherit)
+
+(after! flycheck
+  (defun my/flycheck-emacs-lisp-filter (errors)
+    "Filter out 'assignment to free variable' and 'reference to free variable' warnings."
+    (seq-remove (lambda (err)
+                  (let ((msg (flycheck-error-message err)))
+                    (or (string-match-p "assignment to free variable" msg)
+                        (string-match-p "reference to free variable" msg)
+                        (string-match-p "the function .* is not known to be defined" msg))))
+                errors))
+
+  (defun my/apply-flycheck-filter-h ()
+    (setq-local flycheck-checker-error-filter #'my/flycheck-emacs-lisp-filter))
+
+  (add-hook 'emacs-lisp-mode-hook #'my/apply-flycheck-filter-h))
 
 ;; Make native compilation silent and prune its cache.
 (when (native-comp-available-p)
@@ -81,13 +98,12 @@
 
 (load! "./lisp/setup-config")
 (load! "./lisp/setup-yas")
-(load! "./lisp/setup-theme-lambda")
+(load! "./lisp/setup-theme-modern")
 ;;(load! "./lisp/setup-theme-nano")
 (load! "./lisp/setup-utils")
 (load! "./lisp/dired-fixups")
+(load! "./lisp/notebook")
 (load! "./lisp/setup-multimedia.el")
-
-
 
 (after! dired
   (remove-hook 'dired-mode-hook 'dired-omit-mode)
@@ -101,22 +117,22 @@
 
 
 
+(defun dino-dired-mode-hook-fn ()
+  (hl-line-mode 1)
+  (define-key dired-mode-map (kbd "C-c C-g") #'dino-dired-kill-new-file-contents)
+  (define-key dired-mode-map (kbd "C-c C-c") #'dino-dired-copy-file-to-dir-in-other-window)
+  (define-key dired-mode-map (kbd "C-c C-m") #'dino-dired-move-file-to-dir-in-other-window)
+  (define-key dired-mode-map (kbd "C-c m")   #'magit-status)
+  (define-key dired-mode-map (kbd "C-x m")   #'magit-status)
+  ;; converse of i (dired-maybe-insert-subdir)
+  (define-key dired-mode-map (kbd "K")  #'dired-kill-subdir)
+  (define-key dired-mode-map (kbd "F")  #'dino-dired-do-find)
+  (define-key dired-mode-map (kbd "s")  #'dino-dired-sort-cycle)
+  (dino-dired-sort-cycle "t") ;; by default, sort by time
+  (turn-on-auto-revert-mode))
+
 (with-eval-after-load 'dired
   (add-hook! 'dired-mode-hook 'context-menu-mode))
-
-;; (defun dino-dired-mode-hook-fn ()
-;;   (hl-line-mode 1)
-;;   (define-key dired-mode-map (kbd "C-c C-g") #'dino-dired-kill-new-file-contents)
-;;   (define-key dired-mode-map (kbd "C-c C-c") #'dino-dired-copy-file-to-dir-in-other-window)
-;;   (define-key dired-mode-map (kbd "C-c C-m") #'dino-dired-move-file-to-dir-in-other-window)
-;;   (define-key dired-mode-map (kbd "C-c m")   #'magit-status)
-;;   (define-key dired-mode-map (kbd "C-x m")   #'magit-status)
-;;   ;; converse of i (dired-maybe-insert-subdir)
-;;   (define-key dired-mode-map (kbd "K")  #'dired-kill-subdir)
-;;   (define-key dired-mode-map (kbd "F")  #'dino-dired-do-find)
-;;   (define-key dired-mode-map (kbd "s")  #'dino-dired-sort-cycle)
-;;   (dino-dired-sort-cycle "t") ;; by default, sort by time
-;;   (turn-on-auto-revert-mode))
 
 
 (after! org

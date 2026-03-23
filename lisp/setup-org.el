@@ -252,13 +252,18 @@ This is used as :override advice on `org-activate-footnote-links'."
         (:tangle . "no")
         (:comments . "link")))
 
+(defun doom-shut-up-a (orig-fn &rest args)
+  (quiet! (apply orig-fn args)))
+
+(advice-add 'org-babel-execute-src-block :around #'doom-shut-up-a)
+
 (setq org-latex-default-table-environment "longtable"
       org-latex-remove-logfiles t
       org-latex-compiler "lualatex"
       ;; org-latex-pdf-process (list "texliveonfly.py %f"))
       org-latex-pdf-process (list "latexmk -pdflatex='lualatex -synctex=1 -shell-escape -interaction nonstopmode' -shell-escape -pdf -bibtex -f -output-directory=%o %f"))
 
-(setq org-preview-latex-default-process 'dvisvgm)
+(setq org-preview-latex-default-process 'dvipng)
 
 ;; https://github.com/emacsmirror/org-contrib
 (use-package! ox-extra
@@ -540,21 +545,20 @@ This is used as :override advice on `org-activate-footnote-links'."
   )
 
 ;; Hugo Export Functions
-(after! ox-hugo
-  (defun compile-dir-org ()
-    "Publish all Org files in a directory."
-    (interactive)
-    (save-excursion
-      (mapc
-       (lambda (file)
-         (with-current-buffer (find-file-noselect file)
-           (org-hugo-export-to-md)))
-       (file-expand-wildcards "*.org"))))
+(defun compile-dir-org ()
+  "Publish all Org files in a directory."
+  (interactive)
+  (save-excursion
+    (mapc
+     (lambda (file)
+       (with-current-buffer (find-file-noselect file)
+         (org-hugo-export-to-md)))
+     (file-expand-wildcards "*.org"))))
 
-  (defun deploy-saade-me ()
-    "Publish all Org files in a directory."
-    (interactive)
-    (start-process-shell-command "publish" nil "~/.bin/deploy-saade.me.sh")))
+(defun deploy-saade-me ()
+  "Publish all Org files in a directory."
+  (interactive)
+  (start-process-shell-command "publish" nil "~/.bin/deploy-saade.me.sh"))
 
 ;; Org-roam Templates
 (setq org-roam-capture-templates
