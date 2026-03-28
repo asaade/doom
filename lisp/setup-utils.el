@@ -1,4 +1,4 @@
-;;; lisp/setup-utils.el --- varias utilerías -*- lexical-binding: t; -*-
+;;; $DOOMDIR/lisp/setup-utils.el -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
 ;;;
@@ -6,7 +6,6 @@
 (global-set-key [mouse-3] 'mouse-popup-menubar-stuff)          ; Gives right-click a context menu
 (global-set-key (kbd "M-DEL") 'sanemacs/backward-kill-word)    ; Kill word without copying it to your clipboard
 (global-set-key (kbd "C-DEL") 'sanemacs/backward-kill-word)    ; Kill word without copying it to your clipboard
-
 
 (after! ispell
   (let ((langs '("spanish" "american" "francais")))
@@ -67,7 +66,6 @@ Saves to a temp file and puts the filename in the kill ring."
 (defun insert-current-date () (interactive)
        (insert (format-time-string "%Y-%m-%d")))
 
-
 (defun insdate-insert-current-date (&optional omit-day-of-week-p)
   "Insert today's date using the current locale.
   With a prefix argument, the date is inserted without the day of
@@ -81,7 +79,6 @@ Saves to a temp file and puts the filename in the kill ring."
   (interactive (list (calendar-read-date)))
   (insert (calendar-date-string date)))
 
-
 (defun insdate-insert-date-from (&optional days)
   "Insert date that is DAYS from current."
   (interactive (list (read-number (format "days: ") 0)))
@@ -91,7 +88,6 @@ Saves to a temp file and puts the filename in the kill ring."
      (+ (calendar-absolute-from-gregorian (calendar-current-date))
         days))
     t)))
-
 
 (defun help/insert-em-dash ()
   "Inserts an EM-DASH (not a HYPEN, not an N-DASH)"
@@ -130,7 +126,6 @@ might be bad."
   (delete-trailing-whitespace)
   (set-buffer-file-coding-system 'utf-8))
 
-
 (defun ash/cleanup-buffer ()
   "Perform a bunch of operations on the whitespace content of a buffer.
 Including indent-buffer, which should not be called automatically on save."
@@ -153,29 +148,29 @@ Including indent-buffer, which should not be called automatically on save."
   (set-buffer-modified-p nil)
   (kill-this-buffer))
 
-(defun prot/keyboard-quit-dwim ()
-  "Do-What-I-Mean behaviour for a general `keyboard-quit'.
+;; (defun prot/keyboard-quit-dwim ()
+;;   "Do-What-I-Mean behaviour for a general `keyboard-quit'.
 
-The generic `keyboard-quit' does not do the expected thing when
-the minibuffer is open.  Whereas we want it to close the
-minibuffer, even without explicitly focusing it.
+;; The generic `keyboard-quit' does not do the expected thing when
+;; the minibuffer is open.  Whereas we want it to close the
+;; minibuffer, even without explicitly focusing it.
 
-The DWIM behaviour of this command is as follows:
+;; The DWIM behaviour of this command is as follows:
 
-- When the region is active, disable it.
-- When a minibuffer is open, but not focused, close the minibuffer.
-- When the Completions buffer is selected, close it.
-- In every other case use the thin `keyboard-quit'."
-  (interactive)
-  (cond
-   ((region-active-p)
-    (keyboard-quit))
-   ((derived-mode-p 'completion-list-mode)
-    (delete-completion-window))
-   ((> (minibuffer-depth) 0)
-    (abort-recursive-edit))
-   (t
-    (keyboard-quit))))
+;; - When the region is active, disable it.
+;; - When a minibuffer is open, but not focused, close the minibuffer.
+;; - When the Completions buffer is selected, close it.
+;; - In every other case use the thin `keyboard-quit'."
+;;   (interactive)
+;;   (cond
+;;    ((region-active-p)
+;;     (keyboard-quit))
+;;    ((derived-mode-p 'completion-list-mode)
+;;     (delete-completion-window))
+;;    ((> (minibuffer-depth) 0)
+;;     (abort-recursive-edit))
+;;    (t
+;;     (keyboard-quit))))
 
 (defun goto-last-modification ()
   (interactive)
@@ -208,53 +203,24 @@ The DWIM behaviour of this command is as follows:
 (map! "M-n M-n" (cmd! (insert "\u200B")))
 
 
-;; ;;;###autoload
-;; (defadvice! my-super-backward-delete-a (&rest _)
-;;   "Special function to super-delete things.
+;; (defun jethro/open-with (arg)
+;;   "Open visited file in default external program.
+;; When in dired mode, open file under the cursor.
+;; With a prefix ARG always prompt for command to use."
+;;   (interactive "P")
+;;   (let* ((current-file-name
+;;           (if (eq major-mode 'dired-mode)
+;;               (dired-get-file-for-visit)
+;;             buffer-file-name))
+;;          (open (pcase system-type
+;;                  (`darwin "open")
+;;                  ((or `gnu `gnu/linux `gnu/kfreebsd) "xdg-open")))
+;;          (program (if (or arg (not open))
+;;                       (read-shell-command "Open current file with: ")
+;;                     open)))
+;;     (call-process program nil 0 nil current-file-name)))
 
-;; If the line content before cursor contains only blank characters, this function
-;; will delete all the blank characters, and then, join with the previous line. I
-;; there is any non-blank character before cursor, this function will delete the
-;; entire line, but keep the correct indentation on it."
-;;   :before '+default--delete-backward-char-a
-;;   (let* ((line-pos (- (point) (point-at-bol)))
-;;          (prev-indent (save-excursion
-;;                         (forward-line -1)
-;;                         (current-indentation)))
-;;          (prev-line-bol (point-at-bol 0))
-;;          (next-line-eol (point-at-eol 2))
-;;          (smart-bs-p (or (save-excursion
-;;                            (and (re-search-backward "{[ \t]*\n[ \t]*" prev-line-bol t)
-;;                                 (re-search-forward "[ \t]*\n[ \t]*}" next-line-eol t)))
-;;                          (save-excursion
-;;                            (and (re-search-backward "\\[[ \t]*\n[ \t]*" prev-line-bol t)
-;;                                 (re-search-forward "[ \t]*\n[ \t]*\\]" next-line-eol t)))
-;;                          (save-excursion
-;;                            (and (re-search-backward "([ \t]*\n[ \t]*" prev-line-bol t)
-;;                                 (re-search-forward "[ \t]*\n[ \t]*)" next-line-eol t))))))
-;;     (when (and smart-bs-p
-;;                (<= line-pos (+ prev-indent standard-indent)))
-;;       (delete-char (- line-pos)))))
-
-
-(defun jethro/open-with (arg)
-  "Open visited file in default external program.
-When in dired mode, open file under the cursor.
-With a prefix ARG always prompt for command to use."
-  (interactive "P")
-  (let* ((current-file-name
-          (if (eq major-mode 'dired-mode)
-              (dired-get-file-for-visit)
-            buffer-file-name))
-         (open (pcase system-type
-                 (`darwin "open")
-                 ((or `gnu `gnu/linux `gnu/kfreebsd) "xdg-open")))
-         (program (if (or arg (not open))
-                      (read-shell-command "Open current file with: ")
-                    open)))
-    (call-process program nil 0 nil current-file-name)))
-
-(map! "C-c o o" 'jethro/open-with)
+;; (map! "C-c o o" 'jethro/open-with)
 
 
 (defun ash/save-ignore-errors ()
@@ -291,7 +257,6 @@ With a prefix ARG always prompt for command to use."
           (delete-region beg end)
           (prin1 result (current-buffer)))
       (error (message "Invalid expression")))))
-
 
 (use-package! iedit)
 
@@ -434,63 +399,63 @@ With a prefix ARG always prompt for command to use."
 
 
 
-;; https://sachachua.com/dotemacs/index.html#embark-audio
-(defun my-embark-audio ()
-  "Match audio."
-  (let ((extensions "m4a\\|mp3\\|wav\\|ogg\\|opus"))
-    (if-let ((link (and (derived-mode-p 'org-mode)
-                        (org-element-context))))
-        (when (eq (org-element-type link) 'link)
-          (cond
-           ((string-match extensions (org-element-property :path link))
-            (cons 'audio (org-element-property :path link)))))
-      (when (and (derived-mode-p 'dired-mode)
-                 (string-match extensions (dired-get-filename)))
-        (cons 'audio (dired-get-filename))))))
+;; ;; https://sachachua.com/dotemacs/index.html#embark-audio
+;; (defun my-embark-audio ()
+;;   "Match audio."
+;;   (let ((extensions "m4a\\|mp3\\|wav\\|ogg\\|opus"))
+;;     (if-let ((link (and (derived-mode-p 'org-mode)
+;;                         (org-element-context))))
+;;         (when (eq (org-element-type link) 'link)
+;;           (cond
+;;            ((string-match extensions (org-element-property :path link))
+;;             (cons 'audio (org-element-property :path link)))))
+;;       (when (and (derived-mode-p 'dired-mode)
+;;                  (string-match extensions (dired-get-filename)))
+;;         (cons 'audio (dired-get-filename))))))
 
-(defun my-audio-text (file &optional insert)
-  "Get the text for FILE audio.
-If called interactively, copy to the kill ring."
-  (interactive (list (read-file-name "Audio: ")))
-  (let (text)
-    (cond
-     ((file-exists-p (concat (file-name-sans-extension file) ".txt"))
-      (with-temp-buffer
-        (insert-file-contents (concat (file-name-sans-extension file) ".txt"))
-        (setq text (buffer-string))))
-     ;; no txt yet, is there a vtt?
-     ((file-exists-p (concat (file-name-sans-extension file) ".vtt"))
-      (setq text (subed-subtitle-list-text
-                  (subed-parse-file (concat (file-name-sans-extension file) ".vtt")))))
-     ;; no VTT, let's recognize it
-     (t
-      (my-deepgram-recognize-audio file)
-      (when (file-exists-p (concat (file-name-sans-extension file) ".vtt"))
-        (setq text (subed-subtitle-list-text
-                    (subed-parse-file (concat (file-name-sans-extension file) ".vtt")))))))
-    (when text
-      (when (called-interactively-p 'any)
-        (if insert
-            (insert text "\n")
-          (kill-new text)))
-      text)))
+;; (defun my-audio-text (file &optional insert)
+;;   "Get the text for FILE audio.
+;; If called interactively, copy to the kill ring."
+;;   (interactive (list (read-file-name "Audio: ")))
+;;   (let (text)
+;;     (cond
+;;      ((file-exists-p (concat (file-name-sans-extension file) ".txt"))
+;;       (with-temp-buffer
+;;         (insert-file-contents (concat (file-name-sans-extension file) ".txt"))
+;;         (setq text (buffer-string))))
+;;      ;; no txt yet, is there a vtt?
+;;      ((file-exists-p (concat (file-name-sans-extension file) ".vtt"))
+;;       (setq text (subed-subtitle-list-text
+;;                   (subed-parse-file (concat (file-name-sans-extension file) ".vtt")))))
+;;      ;; no VTT, let's recognize it
+;;      (t
+;;       (my-deepgram-recognize-audio file)
+;;       (when (file-exists-p (concat (file-name-sans-extension file) ".vtt"))
+;;         (setq text (subed-subtitle-list-text
+;;                     (subed-parse-file (concat (file-name-sans-extension file) ".vtt")))))))
+;;     (when text
+;;       (when (called-interactively-p 'any)
+;;         (if insert
+;;             (insert text "\n")
+;;           (kill-new text)))
+;;       text)))
 
-(defun my-open-in-audacity (file)
-  (interactive "FFile: ")
-  (start-process "audacity" nil "audacity" file))
+;; (defun my-open-in-audacity (file)
+;;   (interactive "FFile: ")
+;;   (start-process "audacity" nil "audacity" file))
 
-(with-eval-after-load 'embark
-  (add-to-list 'embark-target-finders 'my-embark-audio)
-  (defvar-keymap my-embark-audio-actions
-    :doc "audio"
-    "a" #'my-open-in-audacity
-    "d" #'my-deepgram-recognize-audio
-    "$" #'my-deepgram-cost
-    "D" #'my-audio-braindump-reprocess
-    "m" #'mpv-play
-    "w" #'my-audio-text
-    "W" #'waveform-show)
-  (add-to-list 'embark-keymap-alist '(audio . my-embark-audio-actions)))
+;; (with-eval-after-load 'embark
+;;   (add-to-list 'embark-target-finders 'my-embark-audio)
+;;   (defvar-keymap my-embark-audio-actions
+;;     :doc "audio"
+;;     "a" #'my-open-in-audacity
+;;     "d" #'my-deepgram-recognize-audio
+;;     "$" #'my-deepgram-cost
+;;     "D" #'my-audio-braindump-reprocess
+;;     "m" #'mpv-play
+;;     "w" #'my-audio-text
+;;     "W" #'waveform-show)
+;;   (add-to-list 'embark-keymap-alist '(audio . my-embark-audio-actions)))
 
 
 (defun my-embark-video ()
@@ -852,8 +817,8 @@ in whole buffer.  With neither, delete comments on current line."
         try-expand-dabbrev
         try-expand-all-abbrevs
         try-expand-dabbrev-all-buffers
-        ;; try-complete-file-name-partially
-        ;; try-complete-file-name
+        try-complete-file-name-partially
+        try-complete-file-name
         try-expand-dabbrev-from-kill
         try-expand-whole-kill
         try-expand-line

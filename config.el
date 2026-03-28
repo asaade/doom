@@ -101,9 +101,11 @@
 (load! "./lisp/setup-theme-modern")
 ;;(load! "./lisp/setup-theme-nano")
 (load! "./lisp/setup-utils")
-(load! "./lisp/dired-fixups")
+(load! "./lisp/setup-hugo")
+(load! "./lisp/setup-deft")
+;;(load! "./lisp/dired-fixups")
 (load! "./lisp/notebook")
-(load! "./lisp/setup-multimedia.el")
+;;(load! "./lisp/setup-multimedia.el")
 
 (after! dired
   (remove-hook 'dired-mode-hook 'dired-omit-mode)
@@ -117,19 +119,19 @@
 
 
 
-(defun dino-dired-mode-hook-fn ()
-  (hl-line-mode 1)
-  (define-key dired-mode-map (kbd "C-c C-g") #'dino-dired-kill-new-file-contents)
-  (define-key dired-mode-map (kbd "C-c C-c") #'dino-dired-copy-file-to-dir-in-other-window)
-  (define-key dired-mode-map (kbd "C-c C-m") #'dino-dired-move-file-to-dir-in-other-window)
-  (define-key dired-mode-map (kbd "C-c m")   #'magit-status)
-  (define-key dired-mode-map (kbd "C-x m")   #'magit-status)
-  ;; converse of i (dired-maybe-insert-subdir)
-  (define-key dired-mode-map (kbd "K")  #'dired-kill-subdir)
-  (define-key dired-mode-map (kbd "F")  #'dino-dired-do-find)
-  (define-key dired-mode-map (kbd "s")  #'dino-dired-sort-cycle)
-  (dino-dired-sort-cycle "t") ;; by default, sort by time
-  (turn-on-auto-revert-mode))
+;; (defun dino-dired-mode-hook-fn ()
+;;   (hl-line-mode 1)
+;;   (define-key dired-mode-map (kbd "C-c C-g") #'dino-dired-kill-new-file-contents)
+;;   (define-key dired-mode-map (kbd "C-c C-c") #'dino-dired-copy-file-to-dir-in-other-window)
+;;   (define-key dired-mode-map (kbd "C-c C-m") #'dino-dired-move-file-to-dir-in-other-window)
+;;   (define-key dired-mode-map (kbd "C-c m")   #'magit-status)
+;;   (define-key dired-mode-map (kbd "C-x m")   #'magit-status)
+;;   ;; converse of i (dired-maybe-insert-subdir)
+;;   (define-key dired-mode-map (kbd "K")  #'dired-kill-subdir)
+;;   (define-key dired-mode-map (kbd "F")  #'dino-dired-do-find)
+;;   (define-key dired-mode-map (kbd "s")  #'dino-dired-sort-cycle)
+;;   (dino-dired-sort-cycle "t") ;; by default, sort by time
+;;   (turn-on-auto-revert-mode))
 
 (with-eval-after-load 'dired
   (add-hook! 'dired-mode-hook 'context-menu-mode))
@@ -148,7 +150,7 @@
 (map! "C-c C-n"  #'ash/cleanup-buffer)
 (map! "C-c P"    #'ash/copy-file-name-to-clipboard)
 (map! "C-c r"    #'consult-ripgrep)
-(map! "C-g"      #'prot/keyboard-quit-dwim)
+;;(map! "C-g"      #'prot/keyboard-quit-dwim)
 (map! "C-s"      #'+default/search-buffer)
 (map! "C-x k"    #'kill-current-buffer)
 (map! "C-x C-j"  #'ash/kill-other-buffers)

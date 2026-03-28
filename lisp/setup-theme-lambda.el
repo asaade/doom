@@ -34,8 +34,15 @@
       (my/apply-theme 'light)
     (my/apply-theme 'dark)))
 
-(set-default 'cursor-type  '(bar . 2))
-(blink-cursor-mode 1)
+;; (set-default 'cursor-type  '(bar . 2))
+;; (blink-cursor-mode 1)
+
+(setq-default cursor-in-non-selected-windows nil ; Hide the cursor in inactive windows
+              cursor-type '(hbar . 2)            ; Underline-shaped cursor
+              cursor-intangible-mode t           ; Enforce cursor intangibility
+              x-stretch-cursor nil)              ; Don't stretch cursor to the glyph width
+
+(blink-cursor-mode 0)                            ; Still cursor
 
 ;; Line spacing, can be 0 for code and 1 or 2 for text
 (setq-default line-spacing 0)
@@ -153,53 +160,53 @@ Also immediately enables `mixed-pitch-modes' if currently in one of the modes."
 (set-char-table-range composition-function-table ?f '(["\\(?:ff?[fijlt]\\)" 0 font-shape-gstring]))
 (set-char-table-range composition-function-table ?T '(["\\(?:Th\\)" 0 font-shape-gstring]))
 
-(after! marginalia
-  (setq marginalia-censor-variables nil)
+;; (after! marginalia
+;;   (setq marginalia-censor-variables nil)
 
-  (defadvice! +marginalia--annotate-local-file-colorful (cand)
-    "Just a more colourful version of `marginalia--annotate-local-file'."
-    :override #'marginalia--annotate-local-file
-    (marginalia--in-minibuffer
-      (when-let* ((attrs (ignore-errors
-                           (file-attributes (substitute-in-file-name
-                                             (marginalia--full-candidate cand))
-                                            'integer))))
-        (if (bound-and-true-p marginalia-align)
-            (if (eq marginalia-align 'right)
-                (marginalia--fields
-                 ((marginalia--file-owner attrs) :face 'marginalia-file-owner)
-                 ((marginalia--file-modes attrs))
-                 ((+marginalia-file-size-colorful (file-attribute-size attrs)) :width -7)
-                 ((+marginalia--time-colorful (file-attribute-modification-time attrs)) :width -12))
-              (marginalia--fields
-               ((marginalia--file-modes attrs))
-               ((+marginalia-file-size-colorful (file-attribute-size attrs)) :width 7)
-               ((+marginalia--time-colorful (file-attribute-modification-time attrs)) :width 12)
-               ((marginalia--file-owner attrs) :face 'marginalia-file-owner)))
-          ;; fallback if marginalia-align is not bound
-          (marginalia--fields
-           ((marginalia--file-owner attrs) :width 12 :face 'marginalia-file-owner)
-           ((marginalia--file-modes attrs))
-           ((+marginalia-file-size-colorful (file-attribute-size attrs)) :width 7)
-           ((+marginalia--time-colorful (file-attribute-modification-time attrs)) :width 12))))))
+;;   (defadvice! +marginalia--annotate-local-file-colorful (cand)
+;;     "Just a more colourful version of `marginalia--annotate-local-file'."
+;;     :override #'marginalia--annotate-local-file
+;;     (marginalia--in-minibuffer
+;;       (when-let* ((attrs (ignore-errors
+;;                            (file-attributes (substitute-in-file-name
+;;                                              (marginalia--full-candidate cand))
+;;                                             'integer))))
+;;         (if (bound-and-true-p marginalia-align)
+;;             (if (eq marginalia-align 'right)
+;;                 (marginalia--fields
+;;                  ((marginalia--file-owner attrs) :face 'marginalia-file-owner)
+;;                  ((marginalia--file-modes attrs))
+;;                  ((+marginalia-file-size-colorful (file-attribute-size attrs)) :width -7)
+;;                  ((+marginalia--time-colorful (file-attribute-modification-time attrs)) :width -12))
+;;               (marginalia--fields
+;;                ((marginalia--file-modes attrs))
+;;                ((+marginalia-file-size-colorful (file-attribute-size attrs)) :width 7)
+;;                ((+marginalia--time-colorful (file-attribute-modification-time attrs)) :width 12)
+;;                ((marginalia--file-owner attrs) :face 'marginalia-file-owner)))
+;;           ;; fallback if marginalia-align is not bound
+;;           (marginalia--fields
+;;            ((marginalia--file-owner attrs) :width 12 :face 'marginalia-file-owner)
+;;            ((marginalia--file-modes attrs))
+;;            ((+marginalia-file-size-colorful (file-attribute-size attrs)) :width 7)
+;;            ((+marginalia--time-colorful (file-attribute-modification-time attrs)) :width 12))))))
 
-  (defun +marginalia--time-colorful (time)
-    (let* ((seconds (float-time (time-subtract (current-time) time)))
-           (fg-date (face-attribute 'marginalia-date :foreground nil t))
-           (fg-doc  (face-attribute 'marginalia-documentation :foreground nil t))
-           (color (doom-blend
-                   (if (stringp fg-date) fg-date "white")
-                   (if (stringp fg-doc) fg-doc "gray")
-                   (max 0.0 (min 1.0 (/ 1.0 (log (+ 3 (/ (+ 1 seconds) 345600.0)))))))))
-      (propertize (marginalia--time time) 'face (list :foreground color))))
+;;   (defun +marginalia--time-colorful (time)
+;;     (let* ((seconds (float-time (time-subtract (current-time) time)))
+;;            (fg-date (face-attribute 'marginalia-date :foreground nil t))
+;;            (fg-doc  (face-attribute 'marginalia-documentation :foreground nil t))
+;;            (color (doom-blend
+;;                    (if (stringp fg-date) fg-date "white")
+;;                    (if (stringp fg-doc) fg-doc "gray")
+;;                    (max 0.0 (min 1.0 (/ 1.0 (log (+ 3 (/ (+ 1 seconds) 345600.0)))))))))
+;;       (propertize (marginalia--time time) 'face (list :foreground color))))
 
-  (defun +marginalia-file-size-colorful (size)
-    (let* ((size-index (/ (log (+ 1.0 size)) 16.118)) ; log(10,000,000)
-           (color (if (< size 10000000) ; 10m
-                      (doom-blend "orange" "green" (max 0.0 (min 1.0 size-index)))
-                    (let ((large-index (/ (- (log (+ 1.0 size)) 16.118) 4.605)))
-                      (doom-blend "red" "orange" (max 0.0 (min 1.0 large-index)))))))
-      (propertize (file-size-human-readable size) 'face (list :foreground color)))))
+;;   (defun +marginalia-file-size-colorful (size)
+;;     (let* ((size-index (/ (log (+ 1.0 size)) 16.118)) ; log(10,000,000)
+;;            (color (if (< size 10000000) ; 10m
+;;                       (doom-blend "orange" "green" (max 0.0 (min 1.0 size-index)))
+;;                     (let ((large-index (/ (- (log (+ 1.0 size)) 16.118) 4.605)))
+;;                       (doom-blend "red" "orange" (max 0.0 (min 1.0 large-index)))))))
+;;       (propertize (file-size-human-readable size) 'face (list :foreground color)))))
 
 
 (setq +zen-text-scale 0.9
@@ -228,29 +235,6 @@ Also immediately enables `mixed-pitch-modes' if currently in one of the modes."
   (setq-default typopunct-buffer-language 'spanish))
 
 (add-hook! 'org-mode-hook :append #'ash/pretty)
-
-(after! orderless
-  (defvar my-orderless-accent-replacements
-    '(("a" . "[aàáâãäå]")
-      ("e" . "[eèéêë]")
-      ("i" . "[iìíîï]")
-      ("o" . "[oòóôõöœ]")
-      ("u" . "[uùúûü]")
-      ("c" . "[cç]")
-      ("n" . "[nñ]"))) ; in case anyone needs ñ for Spanish
-
-  (defun my-orderless-accent-regexp (component)
-    "Match COMPONENT as a regexp, but ignoring accents."
-    (let ((res (seq-reduce
-                (lambda (prev val)
-                  (replace-regexp-in-string (car val) (cdr val) prev))
-                my-orderless-accent-replacements
-                component)))
-      (orderless-regexp res)))
-
-  (setq completion-styles '(orderless basic)
-        completion-category-overrides '((file (styles basic partial-completion))))
-  (add-to-list 'orderless-matching-styles 'my-orderless-accent-regexp))
 
 (provide 'setup-theme-lambda)
 ;;; setup-theme-lambda.el ends here

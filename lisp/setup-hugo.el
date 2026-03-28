@@ -1,4 +1,4 @@
-;;; ../../Dropbox/doom/lisp/setup-hugo.el -*- lexical-binding: t; -*-
+;;; $DOOMDIR/lisp/setup-hugo.el -*- lexical-binding: t; -*-
 
 (defun my-hugo-export ()
    (org-hugo-export-wim-to-md-after-save))

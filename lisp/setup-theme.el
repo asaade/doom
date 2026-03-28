@@ -147,10 +147,10 @@
             'corfu-default 'font-latex-math-face)
   (setq mixed-pitch-set-height t))
 
-(setq ;;+zen-text-scale 1.1
- writeroom-width 50
+(setq +zen-text-scale 1.1
+      writeroom-width 50
  ;; writeroom-mode-line t
- writeroom-extra-line-spacing 0.2)
+      writeroom-extra-line-spacing 0.2)
 
 
 (defun ash/pretty ()

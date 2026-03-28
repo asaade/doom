@@ -1,4 +1,4 @@
-;;; lisp/setup-config.el --- Main configuration -*- lexical-binding: t; -*-
+;;; $DOOMDIR/lisp/setup-config.el --- Main configuration -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
 
@@ -92,6 +92,56 @@
 (setq read-extended-command-predicate
       #'command-completion-default-include-p)
 
+(after! vertico
+  (setq vertico-count 10)
+  ;; (setq vertico-grid-separator
+  ;;       #("  |  " 2 3 (display (space :width (1))
+  ;;                              face (:background "#ECEFF1")))
+  ;;       vertico-group-format
+  ;;       (concat #(" " 0 1 (face vertico-group-title))
+  ;;               #(" " 0 1 (face vertico-group-separator))
+  ;;               #(" %s " 0 4 (face vertico-group-title))
+  ;;               #(" " 0 1 (face vertico-group-separator
+  ;;                               display (space :align-to (- right (-1 . right-margin) (- +1))))))
+  ;;       )
+
+  (set-face-attribute 'vertico-group-separator nil
+                      :strike-through t)
+
+
+  (setq completion-in-region-function
+        (lambda (&rest args)
+          (apply (if vertico-mode
+                     #'consult-completion-in-region
+                   #'completion--in-region)
+                 args)))
+
+  (defun minibuffer-format-candidate (orig cand prefix suffix index _start)
+    (let ((prefix (if (= vertico--index index)
+                      "  "
+                    "   ")))
+      (funcall orig cand prefix suffix index _start)))
+
+  (advice-add #'vertico--format-candidate
+              :around #'minibuffer-format-candidate))
+
+(after! marginalia
+  (setq-default marginalia--ellipsis "…"    ; Nicer ellipsis
+                ;; marginalia-align 'right     ; right alignment
+                ;;marginalia-align-offset -1
+                ) ; one space on the right
+  )
+
+(defun minibuffer-vertico-setup ()
+  (setq truncate-lines t)
+  (setq completion-in-region-function
+        (if vertico-mode
+            #'consult-completion-in-region
+          #'completion--in-region)))
+
+(add-hook 'vertico-mode-hook #'minibuffer-vertico-setup)
+(add-hook 'minibuffer-setup-hook #'minibuffer-vertico-setup)
+
 
 (defun ash/save-ignore-errors ()
   (ignore-errors
@@ -127,10 +177,6 @@
         web-mode-code-indent-offset 4
         web-mode-enable-auto-pairing t
         web-mode-enable-css-colorization t))
-
-(after! corfu
-  (setq corfu-auto-delay 0.5))
-
 
 ;; https://sachachua.com/dotemacs/index.html#about-this-file-backups-obscure-emacs-package-appreciation-backup-walker
 (use-package backup-walker
@@ -186,6 +232,57 @@
     (kill-buffer diff-buf)))
 (with-eval-after-load 'backup-walker
   (advice-add 'backup-walker-refresh :override #'my-backup-walker-refresh))
+
+(after! corfu
+  (setq corfu-auto-delay 0.5))
+
+;; ---------------------------------------------------------------------------
+;; 10. Orderless (Accent matching)
+;; ---------------------------------------------------------------------------
+(after! orderless
+  (setq orderless-component-separator "[ &]")
+
+  (defun just-one-face (fn &rest args)
+    (let ((orderless-match-faces [completions-common-part]))
+      (apply fn args)))
+
+  (advice-add 'company-capf--candidates :around #'just-one-face)
+
+  (defvar my-orderless-accent-replacements
+    '(("a" . "[aàáâãäå]")
+      ("e" . "[eèéêë]")
+      ("i" . "[iìíîï]")
+      ("o" . "[oòóôõöœ]")
+      ("u" . "[uùúûü]")
+      ("c" . "[cç]")
+      ("n" . "[nñ]")))
+
+  (defun my-orderless-accent-regexp (component)
+    "Match COMPONENT as a regexp, but ignoring accents."
+    (let ((res (seq-reduce
+                (lambda (prev val)
+                  (replace-regexp-in-string (car val) (cdr val) prev))
+                my-orderless-accent-replacements
+                component)))
+      (orderless-regexp res)))
+
+  (setq completion-styles '(substring orderless basic)
+        orderless-component-separator 'orderless-escapable-split-on-space
+        completion-category-overrides '((file (styles basic partial-completion)))
+        read-file-name-completion-ignore-case t
+        read-buffer-completion-ignore-case t
+        completion-ignore-case t)
+
+  (add-to-list 'orderless-matching-styles 'my-orderless-accent-regexp)
+
+  ;; We follow a suggestion by company maintainer u/hvis:
+  ;; https://www.reddit.com/r/emacs/comments/nichkl/comment/gz1jr3s/
+  (defun company-completion-styles (capf-fn &rest args)
+    (let ((completion-styles '(basic partial-completion)))
+      (apply capf-fn args)))
+
+  (advice-add 'company-capf :around #'company-completion-styles))
+
 
 
 (provide 'setup-config)

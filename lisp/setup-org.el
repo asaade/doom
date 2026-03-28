@@ -1,7 +1,9 @@
-;;; lisp/setup-org.el --- Org mode configuration -*- lexical-binding: t; -*-
+;;; $DOOMDIR/lisp/setup-org.el --- Org mode configuration -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
-;;;
+
+(require 'cl-lib)
+(require 'org-element)
 
 (defun skx/update-org-modified-property ()
   "Update '#+LAST_MODIFIED' with the current date/time."
@@ -31,11 +33,12 @@
         (unless (string-match-p "RESULTS" (match-string 0))
           (replace-match (downcase (match-string 0)) t)
           (setq count (1+ count))))
-      (message "Replaced %d occurances" count))))
+      (message "Replaced %d occurrences" count))))
 
-(add-hook! 'org-mode-hook
-  (add-hook 'before-save-hook #'org-syntax-convert-keyword-case-to-lower nil t)
-  (add-hook 'before-save-hook #'skx/update-org-modified-property nil t))
+(add-hook 'org-mode-hook
+          (lambda ()
+            (add-hook 'before-save-hook #'org-syntax-convert-keyword-case-to-lower nil t)
+            (add-hook 'before-save-hook #'skx/update-org-modified-property nil t)))
 
 
 (setq org-confirm-babel-evaluate nil
@@ -75,6 +78,8 @@
       org-image-actual-width 480
       ;; org-hide-emphasis-markers t)
       )
+
+(setq org-id-link-to-org-use-id 'create-if-interactive-and-no-custom-id)
 
 ;; Numbered equations all have (1) as the number for fragments with vanilla
 ;; org-mode. This code injects the correct numbers into the previews so they
@@ -144,8 +149,6 @@
       (insert document)
       (goto-char (point-min)))))
 
-(require 'cl-lib)
-(require 'org-element)
 
 (defun org-element-parse-headline (&optional granularity visible-only)
   "Parse current headline.
@@ -209,7 +212,7 @@ This is used as :override advice on `org-activate-footnote-links'."
 ;;                                       "vrb" "fdb_latexmk" "blg" "brf" "fls" "xml" "bcf" "entoc"
 ;;                                       "ps" "spl" "bbl" "thd" "spl" "bbl" "xmpi" "run.xml" "bcf" "acn"
 ;;                                       "acr" "alg" "glg" "gls" "ist" "thm"))
-(setq org-latex-remove-logfiles t)
+
 
 (use-package! ox-altacv)
 
@@ -257,17 +260,14 @@ This is used as :override advice on `org-activate-footnote-links'."
 
 (advice-add 'org-babel-execute-src-block :around #'doom-shut-up-a)
 
-(setq org-latex-default-table-environment "longtable"
-      org-latex-remove-logfiles t
-      org-latex-compiler "lualatex"
-      ;; org-latex-pdf-process (list "texliveonfly.py %f"))
-      org-latex-pdf-process (list "latexmk -pdflatex='lualatex -synctex=1 -shell-escape -interaction nonstopmode' -shell-escape -pdf -bibtex -f -output-directory=%o %f"))
+
 
 (setq org-preview-latex-default-process 'dvipng)
 
-(let ((dvipng-config (assq 'dvipng org-preview-latex-process-alist)))
-  (when dvipng-config
-    (plist-put (cdr dvipng-config) :latex-compiler '("lualatex --output-format=dvi -interaction nonstopmode -output-directory %o %f"))))
+(after! org
+  (let ((dvipng-config (assq 'dvipng org-preview-latex-process-alist)))
+    (when dvipng-config
+      (plist-put (cdr dvipng-config) :latex-compiler '("lualatex --output-format=dvi -interaction nonstopmode -output-directory %o %f")))))
 
 
 ;; https://github.com/emacsmirror/org-contrib
@@ -325,6 +325,11 @@ This is used as :override advice on `org-activate-footnote-links'."
    :desc "Org insert citation" "t" #'citar))
 
 (after! ox-latex
+  (setq org-latex-default-table-environment "longtable"
+        org-latex-remove-logfiles t
+        org-latex-compiler "lualatex"
+        org-latex-pdf-process (list "latexmk -pdflatex='lualatex -synctex=1 -shell-escape -interaction nonstopmode' -shell-escape -pdf -bibtex -f -output-directory=%o %f"))
+
   ;; Limpiar configuraciones previas para evitar conflictos
   (setq org-latex-classes nil)
 
@@ -338,12 +343,12 @@ This is used as :override advice on `org-activate-footnote-links'."
                  ("\\subsection{%s}" . "\\subsection*{%s}")
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
 
-  ;; 2. Classic Article (CORREGIDA: Ahora usa scrartcl para evitar "Outline")
+  ;; 2. Classic Article
   (add-to-list 'org-latex-classes
                '("classic-article" "\\RequirePackage{silence}
     \\WarningFilter{scrartcl}{Usage of package `titlesec'}
     \\WarningFilter{titlesec}{Non standard sectioning command detected}
-\\documentclass[11pt,letterpaper,footinclude,headinclude,oneside]{scrartcl}
+\\documentclass[11pt,paper=letter,footinclude,headinclude,oneside]{scrartcl}
 \\usepackage[nochapters, style=linedheaders, beramono=false,eulermath=true]{classicthesis}
 [DEFAULT-PACKAGES]
 [PACKAGES]
@@ -389,6 +394,46 @@ This is used as :override advice on `org-activate-footnote-links'."
 [EXTRA]"
                  ("\\section{%s}" . "\\section*{%s}")
                  ("\\subsection{%s}" . "\\subsection*{%s}")))
+
+  ;; 7. IEEE Transactions (Para artículos académicos/científicos)
+  (add-to-list 'org-latex-classes
+               '("ieeetran" "\\documentclass[letterpaper]{IEEEtran}
+[DEFAULT-PACKAGES]
+[PACKAGES]
+[EXTRA]"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+
+  ;; 8. Beamer (Para presentaciones)
+  (add-to-list 'org-latex-classes
+               '("beamer" "\\documentclass[presentation]{beamer}
+[DEFAULT-PACKAGES]
+[PACKAGES]
+[EXTRA]"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+
+  ;; 9. Exam (Para exámenes)
+  (add-to-list 'org-latex-classes
+               '("exam" "\\documentclass[letterpaper]{exam}
+[DEFAULT-PACKAGES]
+[PACKAGES]
+[EXTRA]"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+
+  ;; 10. Springer Enhanced (Para publicaciones Springer)
+  (add-to-list 'org-latex-classes
+               '("springer-enhanced" "\\documentclass[letterpaper]{svjour3}
+[DEFAULT-PACKAGES]
+[PACKAGES]
+[EXTRA]"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
 
   ;; Configuración final
   (setq org-latex-default-class "koma-article")
@@ -549,8 +594,9 @@ This is used as :override advice on `org-activate-footnote-links'."
     (set-visited-file-name new-file)
     (set-buffer-modified-p nil)))
 
-(add-hook! 'org-roam-mode-hook
-  (add-hook 'after-save-hook #'org-rename-to-new-title nil t))
+(add-hook 'org-roam-mode-hook
+          (lambda ()
+            (add-hook 'after-save-hook #'org-rename-to-new-title nil t)))
 
 (add-to-list 'display-buffer-alist
              '("\\*org-roam\\*"

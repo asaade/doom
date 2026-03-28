@@ -59,124 +59,124 @@
   :group 'notebook)
 
 (defcustom notebook-tags
-      '(
-        ;; Inline code
-        ;; --------------------------------------------------------------------
-        ("^#\\+call:" .     ((lambda (tag) (svg-tag-make "CALL"
-                                           :face 'org-meta-line))
-                             (lambda () (interactive) (notebook-call-at-point)) "Call function"))
-        ("call_" .         ((lambda (tag) (svg-tag-make "CALL"
-                                          :face 'default
-                                          :margin 1
-                                          :alignment 0))
-                            (lambda () (interactive) (notebook-call-at-point)) "Call function"))
-        ("src_" .          ((lambda (tag) (svg-tag-make "CALL"
-                                          :face 'default
-                                          :margin 1
-                                          :alignment 0))
-                             (lambda () (interactive) (notebook-call-at-point)) "Execute code"))
+  '(
+    ;; Inline code
+    ;; --------------------------------------------------------------------
+    ("^#\\+call:" .     ((lambda (tag) (svg-tag-make "CALL"
+                                                     :face 'org-meta-line))
+                         (lambda () (interactive) (notebook-call-at-point)) "Call function"))
+    ("call_" .         ((lambda (tag) (svg-tag-make "CALL"
+                                                    :face 'default
+                                                    :margin 1
+                                                    :alignment 0))
+                        (lambda () (interactive) (notebook-call-at-point)) "Call function"))
+    ("src_" .          ((lambda (tag) (svg-tag-make "CALL"
+                                                    :face 'default
+                                                    :margin 1
+                                                    :alignment 0))
+                        (lambda () (interactive) (notebook-call-at-point)) "Execute code"))
 
-        ;; Code blocks
-        ;; --------------------------------------------------------------------
-        ("^#\\+begin_src\\( [a-zA-Z\-]+\\)" .  ((lambda (tag)
-                                                  (svg-tag-make (upcase tag)
-                                                                :face 'org-meta-line
-                                                                :crop-left t))))
-        ("^#\\+begin_src" . ((lambda (tag) (svg-tag-make "RUN"
-                                           :face 'org-meta-line
-                                           :inverse t
-                                           :crop-right t))
-                             (lambda () (interactive) (notebook-run-at-point)) "Run code block"))
-        ("^#\\+end_src" .    ((lambda (tag) (svg-tag-make "END"
-                                            :face 'org-meta-line))))
+    ;; Code blocks
+    ;; --------------------------------------------------------------------
+    ("^#\\+begin_src\\( [a-zA-Z\-]+\\)" .  ((lambda (tag)
+                                              (svg-tag-make (upcase tag)
+                                                            :face 'org-meta-line
+                                                            :crop-left t))))
+    ("^#\\+begin_src" . ((lambda (tag) (svg-tag-make "RUN"
+                                                     :face 'org-meta-line
+                                                     :inverse t
+                                                     :crop-right t))
+                         (lambda () (interactive) (notebook-run-at-point)) "Run code block"))
+    ("^#\\+end_src" .    ((lambda (tag) (svg-tag-make "END"
+                                                      :face 'org-meta-line))))
 
-        ("^#\\+begin_quote" .    ((lambda (tag) (svg-tag-make "QUOTE"
-                                            :face 'org-meta-line))))
+    ("^#\\+begin_quote" .    ((lambda (tag) (svg-tag-make "QUOTE"
+                                                          :face 'org-meta-line))))
 
-        ("^#\\+end_quote" .    ((lambda (tag) (svg-tag-make "QUOTE"
-                                            :face 'org-meta-line))))
-
-
-        ;; Export blocks
-        ;; --------------------------------------------------------------------
-        ("^#\\+begin_export" . ((lambda (tag) (svg-tag-make "EXPORT"
-                                              :face 'org-meta-line
-                                              :inverse t
-                                              :alignment 0
-                                              :crop-right t))))
-        ("^#\\+begin_export\\( [a-zA-Z\-]+\\)" .  ((lambda (tag)
-                                                     (svg-tag-make (upcase tag)
-                                                                   :face 'org-meta-line
-                                                                   :crop-left t))))
-        ("^#\\+end_export" . ((lambda (tag) (svg-tag-make "END"
-                                            :face 'org-meta-line))))
-
-        ;; :noexport: tag
-        ;; --------------------------------------------------------------------
-        ("\\(:no\\)export:" .    ((lambda (tag) (svg-tag-make "NO"
-                                                :face 'org-meta-line
-                                                :inverse t
-                                                :crop-right t))))
-        (":no\\(export:\\)" .    ((lambda (tag) (svg-tag-make "EXPORT"
-                                                :face 'org-meta-line
-                                                :crop-left t))))
-
-        ;; Miscellaneous keywords
-        ;; --------------------------------------------------------------------
-        ("|RUN|" .          ((lambda (tag) (svg-tag-make "RUN"
-                                           :face 'org-meta-line
-                                           :inverse t))))
-        ("|RUN ALL|" .       ((lambda (tag) (svg-tag-make "RUN ALL"
-                                            :face 'org-meta-line))
-                             (lambda () (interactive) (notebook-run)) "Run all notebook code blocks"))
-        ("|SETUP|" .         ((lambda (tag) (svg-tag-make "SETUP"
-                                            :face 'org-meta-line))
-                             (lambda () (interactive) (notebook-setup)) "Setup notebook environment"))
-        ("|EXPORT|" .        ((lambda (tag) (svg-tag-make "EXPORT"
-                                            :face 'org-meta-line))
-                             (lambda () (interactive) (notebook-export-html)) "Export the notebook to HTML"))
-        ("|CALL|" .          ((lambda (tag) (svg-tag-make "CALL"
-                                            :face 'org-meta-line))))
+    ("^#\\+end_quote" .    ((lambda (tag) (svg-tag-make "QUOTE"
+                                                        :face 'org-meta-line))))
 
 
-        ;; References
-        ;; --------------------------------------------------------------------
-        ("\\(\\[cite:@[A-Za-z]+:\\)" .
-         ((lambda (tag) (svg-tag-make (upcase tag)
-                                      :face 'nano-default
-                                      :inverse t
-                                      :beg 7 :end -1
-                                      :crop-right t))))
-        ("\\[cite:@[A-Za-z]+:\\([0-9a-z]+\\]\\)" .
-         ((lambda (tag) (svg-tag-make (upcase tag)
-                                      :face 'nano-default
-                                      :end -1
-                                      :crop-left t))))
+    ;; Export blocks
+    ;; --------------------------------------------------------------------
+    ("^#\\+begin_export" . ((lambda (tag) (svg-tag-make "EXPORT"
+                                                        :face 'org-meta-line
+                                                        :inverse t
+                                                        :alignment 0
+                                                        :crop-right t))))
+    ("^#\\+begin_export\\( [a-zA-Z\-]+\\)" .  ((lambda (tag)
+                                                 (svg-tag-make (upcase tag)
+                                                               :face 'org-meta-line
+                                                               :crop-left t))))
+    ("^#\\+end_export" . ((lambda (tag) (svg-tag-make "END"
+                                                      :face 'org-meta-line))))
 
-        ;; Miscellaneous properties
-        ;; --------------------------------------------------------------------
-        ("^#\\+caption:" .   ((lambda (tag) (svg-tag-make "CAPTION"
-                                            :face 'org-meta-line))))
-        ("^#\\+latex:" .     ((lambda (tag) (svg-tag-make "LATEX"
-                                            :face 'org-meta-line))))
-        ("^#\\+html:" .      ((lambda (tag) (svg-tag-make "HTML"
-                                            :face 'org-meta-line))))
-        ("^#\\+name:" .      ((lambda (tag) (svg-tag-make "NAME"
-                                            :face 'org-meta-line))))
-        ("^#\\+header:" .    ((lambda (tag) (svg-tag-make "HEADER"
-                                            :face 'org-meta-line))))
-        ("^#\\+label:" .     ((lambda (tag) (svg-tag-make "LABEL"
-                                            :face 'org-meta-line))))
-        ("^#\\+results:"  .  ((lambda (tag) (svg-tag-make "RESULTS"
-                                            :face 'org-meta-line))))
-        ("\\(:[A-Z]+:\\)" . ((lambda (tag)
-                               (svg-tag-make tag :beg 1 :end -1))))
-        ("\\(:[A-Z]+\\)\|[a-zA-Z#0-9]+:" . ((lambda (tag)
-                                           (svg-tag-make tag :beg 1 :inverse t
-                                                         :margin 0 :crop-right t))))
-        (":[A-Z]+\\(\|[a-zA-Z#0-9]+:\\)" . ((lambda (tag)
-                                           (svg-tag-make tag :beg 1 :end -1
-                                                         :margin 0 :crop-left t)))))
+    ;; :noexport: tag
+    ;; --------------------------------------------------------------------
+    ("\\(:no\\)export:" .    ((lambda (tag) (svg-tag-make "NO"
+                                                          :face 'org-meta-line
+                                                          :inverse t
+                                                          :crop-right t))))
+    (":no\\(export:\\)" .    ((lambda (tag) (svg-tag-make "EXPORT"
+                                                          :face 'org-meta-line
+                                                          :crop-left t))))
+
+    ;; Miscellaneous keywords
+    ;; --------------------------------------------------------------------
+    ("|RUN|" .          ((lambda (tag) (svg-tag-make "RUN"
+                                                     :face 'org-meta-line
+                                                     :inverse t))))
+    ("|RUN ALL|" .       ((lambda (tag) (svg-tag-make "RUN ALL"
+                                                      :face 'org-meta-line))
+                          (lambda () (interactive) (notebook-run)) "Run all notebook code blocks"))
+    ("|SETUP|" .         ((lambda (tag) (svg-tag-make "SETUP"
+                                                      :face 'org-meta-line))
+                          (lambda () (interactive) (notebook-setup)) "Setup notebook environment"))
+    ("|EXPORT|" .        ((lambda (tag) (svg-tag-make "EXPORT"
+                                                      :face 'org-meta-line))
+                          (lambda () (interactive) (notebook-export-html)) "Export the notebook to HTML"))
+    ("|CALL|" .          ((lambda (tag) (svg-tag-make "CALL"
+                                                      :face 'org-meta-line))))
+
+
+    ;; References
+    ;; --------------------------------------------------------------------
+    ("\\(\\[cite:@[A-Za-z]+:\\)" .
+     ((lambda (tag) (svg-tag-make (upcase tag)
+                                  :face 'nano-default
+                                  :inverse t
+                                  :beg 7 :end -1
+                                  :crop-right t))))
+    ("\\[cite:@[A-Za-z]+:\\([0-9a-z]+\\]\\)" .
+     ((lambda (tag) (svg-tag-make (upcase tag)
+                                  :face 'nano-default
+                                  :end -1
+                                  :crop-left t))))
+
+    ;; Miscellaneous properties
+    ;; --------------------------------------------------------------------
+    ("^#\\+caption:" .   ((lambda (tag) (svg-tag-make "CAPTION"
+                                                      :face 'org-meta-line))))
+    ("^#\\+latex:" .     ((lambda (tag) (svg-tag-make "LATEX"
+                                                      :face 'org-meta-line))))
+    ("^#\\+html:" .      ((lambda (tag) (svg-tag-make "HTML"
+                                                      :face 'org-meta-line))))
+    ("^#\\+name:" .      ((lambda (tag) (svg-tag-make "NAME"
+                                                      :face 'org-meta-line))))
+    ("^#\\+header:" .    ((lambda (tag) (svg-tag-make "HEADER"
+                                                      :face 'org-meta-line))))
+    ("^#\\+label:" .     ((lambda (tag) (svg-tag-make "LABEL"
+                                                      :face 'org-meta-line))))
+    ("^#\\+results:"  .  ((lambda (tag) (svg-tag-make "RESULTS"
+                                                      :face 'org-meta-line))))
+    ("\\(:[A-Z]+:\\)" . ((lambda (tag)
+                           (svg-tag-make tag :beg 1 :end -1))))
+    ("\\(:[A-Z]+\\)\|[a-zA-Z#0-9]+:" . ((lambda (tag)
+                                          (svg-tag-make tag :beg 1 :inverse t
+                                                        :margin 0 :crop-right t))))
+    (":[A-Z]+\\(\|[a-zA-Z#0-9]+:\\)" . ((lambda (tag)
+                                          (svg-tag-make tag :beg 1 :end -1
+                                                        :margin 0 :crop-left t)))))
   "The `notebook-mode' tags alist.
 This alist is the `notebook-mode' specific tags list.  It follows the
 same definition pattern as the `svg-tag-tags' alist (to which
@@ -249,7 +249,7 @@ If non-nil, the org blocks are hidden when the mode is turned on."
     (notebook-mode-off)))
 
 (define-globalized-minor-mode
-   global-notebook-mode notebook-mode notebook-mode-on)
+  global-notebook-mode notebook-mode notebook-mode-on)
 
 (provide 'notebook)
 ;;; notebook.el ends here

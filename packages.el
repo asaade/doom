@@ -10,6 +10,8 @@
            :repo "org-roam/org-roam-ui"
            :files ("*.el" "out")))
 
+(package! ox-hugo)
+
 ;;(unpin! use-package)
 
 ;; (package! kaocha-runner)
@@ -19,6 +21,9 @@
 ;; (package! emacsql :pin "491105a")
 
 (package! spacemacs-theme)
+
+(package! poet-theme)
+
 
 (package! ov)
 
