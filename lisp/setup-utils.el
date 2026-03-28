@@ -3,28 +3,29 @@
 ;;; Code:
 ;;;
 
-(global-set-key [mouse-3] 'mouse-popup-menubar-stuff)          ; Gives right-click a context menu
-(global-set-key (kbd "M-DEL") 'sanemacs/backward-kill-word)    ; Kill word without copying it to your clipboard
-(global-set-key (kbd "C-DEL") 'sanemacs/backward-kill-word)    ; Kill word without copying it to your clipboard
+;; (global-set-key [mouse-3] 'mouse-popup-menubar-stuff)          ; Gives right-click a context menu
+;; (global-set-key (kbd "M-DEL") 'sanemacs/backward-kill-word)    ; Kill word without copying it to your clipboard
+;; (global-set-key (kbd "C-DEL") 'sanemacs/backward-kill-word)    ; Kill word without copying it to your clipboard
 
 (after! ispell
   (let ((langs '("spanish" "american" "francais")))
-    (setq lang-ring (make-ring (length langs)))
+    (setopt lang-ring (make-ring (length langs)))
     (dolist (elem langs) (ring-insert lang-ring elem)))
+
   (defun cycle-ispell-languages ()
     (interactive)
     (let ((lang (ring-ref lang-ring -1)))
       (ring-insert lang-ring lang)
       (ispell-change-dictionary lang)))
-  (setq ispell-dictionary "spanish")
-  (setq ispell-local-dictionary "spanish")
-  (setq ispell-local-dictionary-alist
+  (setopt ispell-dictionary "spanish")
+  (setopt ispell-local-dictionary "spanish")
+  (setopt ispell-local-dictionary-alist
         '(("spanish" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil nil nil utf-8))
         ispell-alternate-dictionary "/usr/share/dict/words")
 
   (global-set-key [f6] 'cycle-ispell-languages))
 
-(setq langtool-default-language "es"
+(setopt langtool-default-language "es"
       ;; langtool-language-tool-jar "/usr/share/java/languagetool/languagetool.jar"
       )
 
@@ -32,7 +33,7 @@
   :defer 3
   :config
   (require 'pcre2el)
-  (setq vr/engine 'pcre2el)
+  (setopt vr/engine 'pcre2el)
   (map! "C-c s r" #'vr/replace)
   (map! "C-c s q" #'vr/query-replace))
 
@@ -43,7 +44,7 @@
 ;;   )
 
 (after! ediff
-  (setq ediff-keep=variants nil
+  (setopt ediff-keep=variants nil
         ediff-make-buffers-readonly-at-startup nil
         ediff-merge-with-ancestor-job t
         ediff-show-clashes-only t
@@ -261,13 +262,13 @@ Including indent-buffer, which should not be called automatically on save."
 (use-package! iedit)
 
 (after! pdf-tools
-  (setq-default pdf-view-display-size 'fit-width)
-  (setq pdf-annot-activate-created-annotations t
+  (setopt-default pdf-view-display-size 'fit-width)
+  (setopt pdf-annot-activate-created-annotations t
         pdf-view-resize-factor 0.8))
 
 ;; (use-package! go-translate
 ;;   :config
-;;   (setq gt-translate-list '(("en" "es"))
+;;   (setopt gt-translate-list '(("en" "es"))
 ;;         gt-default-translator
 ;;         (gt-translator
 ;;          :taker (gt-taker :langs '(es en) :text 'sentence)
@@ -290,10 +291,10 @@ Including indent-buffer, which should not be called automatically on save."
 
 ;; (use-package! gptel
 ;;   :config
-;;   (setq gptel-api-key "your key"
+;;   (setopt gptel-api-key "your key"
 ;;         gptel-default-mode 'org-mode
 ;;         gptel-expert-commads t)
-;;   (setq gptel-model 'llama3.2:latest
+;;   (setopt gptel-model 'llama3.2:latest
 ;;         gptel-backend (gptel-make-ollama "Ollama"
 ;;                                          :host "localhost:11434"
 ;;                                          :stream t
@@ -333,7 +334,7 @@ Including indent-buffer, which should not be called automatically on save."
 ;;   :config
 ;;   (require 'gptel-integrations)
 ;;   (require 'gptel-org)
-;;   (setq gptel-model 'gpt-4.1
+;;   (setopt gptel-model 'gpt-4.1
 ;;         gptel-default-mode 'org-mode
 ;;         gptel-use-curl t
 ;;         gptel-use-tools t
@@ -392,10 +393,10 @@ Including indent-buffer, which should not be called automatically on save."
 ;;                  (push (match-string 0) ollama-models)
 ;;                  (forward-line 1)))
 ;;              (gptel-make-ollama "Ollama" :models ollama-models :stream t)))))
-;;     (setq-default gptel-model "llama-3.1-70b-versatile"
+;;     (setopt-default gptel-model "llama-3.1-70b-versatile"
 ;;                   gptel-backend groq-backend))
 ;;   (delete (assoc "ChatGPT" gptel--known-backends) gptel--known-backends)
-;;   (setq gptel-default-mode #'org-mode))
+;;   (setopt gptel-default-mode #'org-mode))
 
 
 
@@ -422,16 +423,16 @@ Including indent-buffer, which should not be called automatically on save."
 ;;      ((file-exists-p (concat (file-name-sans-extension file) ".txt"))
 ;;       (with-temp-buffer
 ;;         (insert-file-contents (concat (file-name-sans-extension file) ".txt"))
-;;         (setq text (buffer-string))))
+;;         (setopt text (buffer-string))))
 ;;      ;; no txt yet, is there a vtt?
 ;;      ((file-exists-p (concat (file-name-sans-extension file) ".vtt"))
-;;       (setq text (subed-subtitle-list-text
+;;       (setopt text (subed-subtitle-list-text
 ;;                   (subed-parse-file (concat (file-name-sans-extension file) ".vtt")))))
 ;;      ;; no VTT, let's recognize it
 ;;      (t
 ;;       (my-deepgram-recognize-audio file)
 ;;       (when (file-exists-p (concat (file-name-sans-extension file) ".vtt"))
-;;         (setq text (subed-subtitle-list-text
+;;         (setopt text (subed-subtitle-list-text
 ;;                     (subed-parse-file (concat (file-name-sans-extension file) ".vtt")))))))
 ;;     (when text
 ;;       (when (called-interactively-p 'any)
@@ -513,7 +514,7 @@ Including indent-buffer, which should not be called automatically on save."
 
 
 
-(setq code-cells-convert-ipynb-style '(
+(setopt code-cells-convert-ipynb-style '(
                                        ("pandoc" "--to" "ipynb" "--from" "org")
                                        ("pandoc" "--to" "org" "--from" "ipynb")
                                        org-mode))
@@ -570,7 +571,7 @@ targets."
        nil nil t (lambda (binding)
                    (not (string-suffix-p "-argument" (cdr binding))))))))
 
-(setq embark-indicators
+(setopt embark-indicators
       '(embark-which-key-indicator
         embark-highlight-indicator
         embark-isearch-highlight-indicator))
@@ -586,7 +587,7 @@ targets."
   (advice-add #'embark-completing-read-prompter
               :around #'embark-hide-which-key-indicator))
 
-(setq ess-r-flymake-linters
+(setopt ess-r-flymake-linters
       '("closed_curly_linter = NULL" "commas_linter = NULL"
         "commented_code_linter = NULL" "infix_spaces_linter = NULL"
         "line_length_linter = NULL" "object_length_linter = NULL"
@@ -598,8 +599,8 @@ targets."
         "line_length_linter(length = 120L, ignore_string_bodies = FALSE)"
         "return_linter = NULL"))
 
-(setq browse-url-browser-function 'browse-url-generic)
-(setq browse-url-generic-program "firefox")
+(setopt browse-url-browser-function 'browse-url-generic)
+(setopt browse-url-generic-program "firefox")
 
 ;; (defvar xah-replace-invisible-char-list nil
 ;; "A alist used by `xah-replace-invisible-char'.
@@ -608,7 +609,7 @@ targets."
 ;; The nameString is for documentation purposes.
 ;; ")
 
-;; (setq
+;; (setopt
 ;;  xah-replace-invisible-char-list
 ;;  '(
 ;;    ;;
@@ -662,8 +663,8 @@ targets."
 ;;         )
 ;;     (while (re-search-forward xregex nil t)
 ;;       (let (xcharId xname)
-;;         (setq xcharId (string-to-char (match-string 0)))
-;;         (setq xname (get-char-code-property xcharId 'name))
+;;         (setopt xcharId (string-to-char (match-string 0)))
+;;         (setopt xname (get-char-code-property xcharId 'name))
 ;;         (if Confirm-p
 ;;             (if (y-or-n-p (format "found 「%s」 codepoint 「%s」, position 「%s」, replace?" xname xcharId (point)))
 ;;                 (replace-match "")
@@ -684,7 +685,7 @@ targets."
 
 ;; (use-package! treesit-auto
 ;;   :config
-;;   (setq treesit-auto-install 'prompt)
+;;   (setopt treesit-auto-install 'prompt)
 ;;   (treesit-auto-add-to-auto-mode-alist 'all)
 ;;   (global-treesit-auto-mode))
 
@@ -716,7 +717,7 @@ lines starting with this one."
         (when cs
           (goto-char cs)
           (skip-syntax-backward " ")
-          (setq cs (point))
+          (setopt cs (point))
           (comment-forward)
           ;; (kill-region cs (if (bolp) (1- (point)) (point))) ; original
           (delete-region cs (if (bolp) (1- (point)) (point)))  ; replace kill-region with delete-region
@@ -756,7 +757,7 @@ in whole buffer.  With neither, delete comments on current line."
   ;; :bind
   ;;   ;; Don'tforget to set keybinds!
   :config
-  (setq fzf/args "-x --color bw --print-query --margin=1,0 --no-hscroll"
+  (setopt fzf/args "-x --color bw --print-query --margin=1,0 --no-hscroll"
         fzf/executable "fzf"
         fzf/git-grep-args "-i --line-number %s"
         ;; command used for `fzf-grep-*` functions
@@ -768,7 +769,7 @@ in whole buffer.  With neither, delete comments on current line."
         fzf/window-height 15))
 
 
-(setq grip-url-browser "firefox")
+(setopt grip-url-browser "firefox")
 
 (defadvice! fix-ess-display-help (buff)
   :override #'ess-display-help
@@ -776,9 +777,9 @@ in whole buffer.  With neither, delete comments on current line."
 
 
 (after! ess
-  (setq ess-r-flymake-lintr-cache nil)
+  (setopt ess-r-flymake-lintr-cache nil)
   (add-hook! '+popup-mode-hook
-    (setq display-buffer-alist
+    (setopt display-buffer-alist
           (append `(("^\\*R Dired"
                      (display-buffer-reuse-window display-buffer-in-side-window)
                      (side . right)
@@ -807,11 +808,11 @@ in whole buffer.  With neither, delete comments on current line."
       :n "q" nil
       :n "ESC" nil)
 
-(setq lsp-diagnostics-disabled-modes
+(setopt lsp-diagnostics-disabled-modes
       '(ess-mode))
 
 (global-set-key [remap dabbrev-expand] #'hippie-expand)
-(setq hippie-expand-try-functions-list
+(setopt hippie-expand-try-functions-list
       '(try-expand-list
         try-expand-dabbrev-visible
         try-expand-dabbrev
@@ -832,7 +833,7 @@ remainder of the line, to allow for handling potentially duplicated content."
   (let ((len (min (length ins) (length rem))))
     (while (and (> len 0)
                 (not (eq 't (compare-strings ins (- len) nil rem 0 len))))
-      (setq len (1- len)))
+      (setopt len (1- len)))
     len))
 
 (defun +he-suffix-strip-a (args)
@@ -845,25 +846,136 @@ ARGS is the raw argument list (STRING &optional TRANS-CASE)."
                        (point) (line-end-position))))
                (ov (+he-subst-suffix-overlap ins rem)))
     (when (>= ov 0)
-      (setq ins (substring ins 0 (- (length ins) ov))))
+      (setopt ins (substring ins 0 (- (length ins) ov))))
     (list ins trans-case)))
 
 (advice-add #'he-substitute-string :filter-args #'+he-suffix-strip-a)
 
-(setq elfeed-feeds
-      '("https://this-week-in-rust.org/rss.xml"
-        "http://feeds.bbci.co.uk/news/rss.xml"
-        "http://planet.clojure.in/atom.xml"
-        "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
-        "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml"
-        "https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml"
-        "https://rss.nytimes.com/services/xml/rss/nyt/Science.xml"
-        "https://rss.nytimes.com/services/xml/rss/nyt/Books/Review.xml"))
+(defun my/string-pad-right (len s)
+  "If S is shorter than LEN, pad it on the right,
+   if S is longer than LEN, truncate it on the right."
 
-(with-eval-after-load 'elfeed
-  (setq elfeed-search-filter "@1-week-ago +unread"))
+  (if (> (length s) len)
+      (concat (substring s 0 (- len 1)) "…")
+    (concat s (make-string (max 0 (- len (length s))) ?\ ))))
 
-(add-hook 'elfeed-search-mode-hook #'elfeed-update)
+(defun my/string-pad-left (len s)
+  "If S is shorter than LEN, pad it on the left,
+   if S is longer than LEN, truncate it on the left."
+
+  (if (> (length s) len)
+      (concat  "…" (substring s (- (length s) len -1)))
+    (concat (make-string (max 0 (- len (length s))) ?\ ) s)))
+
+(defun my/string-join (len left right &optional spacing)
+  "Join LEFT and RIGHT strings to fit LEN characters with at least SPACING characters
+between them. If len is negative, it is retrieved from current window width."
+
+  (let* ((spacing (or spacing 3))
+         (len (or len (window-body-width)))
+         (len (if (< len 0)
+                  (+ (window-body-width) len)
+                len)))
+    (cond ((> (length right) len)
+           (my/string-pad-left len right))
+
+          ((> (length right) (- len spacing))
+           (my/string-pad-left len (concat (make-string spacing ?\ )
+                                           right)))
+
+          ((> (length left) (- len spacing (length right)))
+           (concat (my/string-pad-right (- len spacing (length right)) left)
+                   (concat (make-string spacing ?\ )
+                           right)))
+          (t
+           (concat left
+                   (make-string (- len (length right) (length left)) ?\ )
+                   right)))))
+
+(after! elfeed
+  (require 'nano-faces)
+  (require 'svg-tag-mode)
+
+  (defun my/elfeed-search-print-entry (entry)
+    "Alternative printing of elfeed entries using SVG tags."
+
+    (let* ((date (elfeed-search-format-date (elfeed-entry-date entry)))
+           (title (or (elfeed-meta entry :title)
+                      (elfeed-entry-title entry) ""))
+           (unread (member 'unread (elfeed-entry-tags entry)))
+           (feed (elfeed-entry-feed entry))
+           (feed-title (when feed
+                         (or (elfeed-meta feed :title)
+                             (elfeed-feed-title feed))))
+           (title-face (if unread 'nano-default 'nano-faded))
+           (date-face (if unread 'nano-salient 'nano-faded))
+           (feed-title-face (if unread 'nano-strong '(nano-strong nano-faded)))
+           (tag-face (if unread 'nano-popout 'nano-faded))
+           (tags (mapcar #'symbol-name (elfeed-entry-tags entry)))
+           (tags (delete "unread" tags))
+           (tags-svg (mapconcat
+                      (lambda (s)
+                        (propertize (concat (upcase s) " ")
+                                    'display (svg-tag-make (upcase s)
+                                                           :margin 0
+                                                           :padding 1
+                                                           :inverse 1
+                                                           :face tag-face)))
+                      tags " "))
+           (left (concat
+                  (when feed-title
+                    (propertize feed-title 'face feed-title-face))
+                  " " tags-svg " "
+                  (propertize title 'face title-face 'kbd-help title)))
+           (right (propertize date 'face date-face)))
+      (insert (my/string-join -1 left right))))
+
+  (setopt elfeed-search-title-max-width 80    ; Maximum titles width
+        elfeed-search-title-min-width 40    ; Minimum titles width
+        elfeed-search-trailing-width 24     ; Space reserved for feed & tag
+        elfeed-search-filter                ; Default filter
+        "@1-weeks-ago +unread"
+        elfeed-search-print-entry-function  ; Alternative print function
+        #'my/elfeed-search-print-entry)
+
+
+  ;; Bind "U" to update feeds on main screen
+  (bind-key "U" #'elfeed-update elfeed-search-mode-map)
+
+  (defun my/elfeed-search-mode-hook ()
+    (hl-line-mode t)
+    (face-remap-add-relative 'hl-line :inherit 'nano-subtle)
+    (set-window-fringes nil 0 1) ; One pixel right fringe to avoid ellipsis
+    (setopt cursor-type nil))
+
+  (add-hook 'elfeed-search-mode-hook  #'my/elfeed-search-mode-hook)
+
+  (defun my/elfeed-show-mode-hook ()
+    (visual-line-mode)
+    ;;  (setopt truncate-lines t)
+
+    (let ((inhibit-read-only t)
+          (inhibit-modification-hooks t))
+      (setopt-local truncate-lines nil)
+      (setopt-local shr-width 79)
+      (set-buffer-modified-p nil)))
+
+  (add-hook 'elfeed-show-mode-hook #'my/elfeed-show-mode-hook)
+
+  (setopt elfeed-feeds
+        '("https://this-week-in-rust.org/rss.xml"
+          "http://feeds.bbci.co.uk/news/rss.xml"
+          "http://planet.clojure.in/atom.xml"
+          "https://rss.nytimes.com/services/xml/rss/nyt/World.xml"
+          "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml"
+          "https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml"
+          "https://rss.nytimes.com/services/xml/rss/nyt/Science.xml"
+          "https://rss.nytimes.com/services/xml/rss/nyt/Books/Review.xml"))
+
+  (with-eval-after-load 'elfeed
+    (setopt elfeed-search-filter "@1-week-ago +unread"))
+
+  (add-hook 'elfeed-search-mode-hook #'elfeed-update))
 
 (use-package! org-pandoc-import :after org)
 

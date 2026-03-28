@@ -1,5 +1,7 @@
 ;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
+;;;===================================================================================
+;;; Benchmark
 (defvar my/init-start-time (current-time) "Time when init.el was started")
 (defvar my/section-start-time (current-time) "Time when section was started")
 (defun my/report-time (section)
@@ -7,6 +9,32 @@
            (concat section " " "section time: ")
            (float-time (time-subtract (current-time) my/section-start-time))))
 (message "---------------------------------------------------------------")
+
+;;;===================================================================================
+
+;; Personal Information
+(setq user-full-name "Antonio Saade"
+      user-mail-address "xxxx@gmail.com")
+
+(add-load-path! "~/.config/doom/lisp")
+
+;; Directory Setup
+(setq dropbox-directory "~/Dropbox"
+      org-directory "~/Dropbox/org"
+      org-roam-directory "~/Dropbox/org/roam"
+      org-roam-dailies-directory "~/Dropbox/org/roam/journal/")
+
+(make-directory "/home/asaade/tmp/" t)
+(setenv "TMPDIR" "/home/asaade/tmp/")
+(setq temporary-file-directory "/home/asaade/tmp/")
+
+;; Custom File Handling
+(setq-default custom-file (expand-file-name ".custom.el" "~/.config/doom/"))
+(when (file-exists-p custom-file)
+  (load custom-file))
+
+(setq ;; auth-sources '("~/.authinfo.gpg")
+ auth-source-cache-expiry nil) ; default is 7200 (2h)
 
 ;;; For performance
 (setq read-process-output-max (* 1024 1024)) ;; 1mb
@@ -36,35 +64,17 @@
 (after! auth-source
   (setq auth-sources (nreverse auth-sources)))
 
-;; Personal Information
-(setq user-full-name "Antonio Saade"
-      user-mail-address "xxxx@gmail.com")
-
-(add-load-path! "~/.config/doom/lisp")
-
-;; Directory Setup
-(setq dropbox-directory "~/Dropbox"
-      org-directory "~/Dropbox/org"
-      org-roam-directory "~/Dropbox/org/roam"
-      org-roam-dailies-directory "~/Dropbox/org/roam/journal/")
-
-(make-directory "/home/asaade/tmp/" t)
-(setenv "TMPDIR" "/home/asaade/tmp/")
-(setq temporary-file-directory "/home/asaade/tmp/")
-
-;; Custom File Handling
-(setq-default custom-file (expand-file-name ".custom.el" "~/.config/doom/"))
-(when (file-exists-p custom-file)
-  (load custom-file))
-
-(setq ;; auth-sources '("~/.authinfo.gpg")
- auth-source-cache-expiry nil) ; default is 7200 (2h)
-
 ;; Ignore excessive free variable assignment/reference warnings in Flycheck
 (setq byte-compile-warnings '(not free-vars unresolved))
-(setq flycheck-emacs-lisp-load-path 'inherit)
+
+;; Make native compilation silent and prune its cache.
+(when (native-comp-available-p)
+  (setq native-comp-async-report-warnings-errors 'silent) ; Emacs 28 with native compilation
+  (setq native-compile-prune-cache t)) ; Emacs 29
 
 (after! flycheck
+  (setq flycheck-emacs-lisp-load-path 'inherit)
+
   (defun my/flycheck-emacs-lisp-filter (errors)
     "Filter out 'assignment to free variable' and 'reference to free variable' warnings."
     (seq-remove (lambda (err)
@@ -78,11 +88,6 @@
     (setq-local flycheck-checker-error-filter #'my/flycheck-emacs-lisp-filter))
 
   (add-hook 'emacs-lisp-mode-hook #'my/apply-flycheck-filter-h))
-
-;; Make native compilation silent and prune its cache.
-(when (native-comp-available-p)
-  (setq native-comp-async-report-warnings-errors 'silent) ; Emacs 28 with native compilation
-  (setq native-compile-prune-cache t)) ; Emacs 29
 
 ;; Enable these
 (mapc
@@ -98,13 +103,16 @@
 
 (load! "./lisp/setup-config")
 (load! "./lisp/setup-yas")
-(load! "./lisp/setup-theme-modern")
-;;(load! "./lisp/setup-theme-nano")
 (load! "./lisp/setup-utils")
-(load! "./lisp/setup-hugo")
 (load! "./lisp/setup-deft")
+(load! "./lisp/setup-theme-modern")
+
+(after! org
+  (load! "./lisp/setup-org")
+  (load! "./lisp/setup-hugo")
+  (load! "./lisp/notebook"))
 ;;(load! "./lisp/dired-fixups")
-(load! "./lisp/notebook")
+;;(load! "./lisp/setup-theme-nano")
 ;;(load! "./lisp/setup-multimedia.el")
 
 (after! dired
@@ -115,30 +123,8 @@
         dired-recursive-deletes (quote always)
         dired-omit-extensions nil
         ;; Directly edit permisison bits!
-        wdired-allow-to-change-permissions t))
-
-
-
-;; (defun dino-dired-mode-hook-fn ()
-;;   (hl-line-mode 1)
-;;   (define-key dired-mode-map (kbd "C-c C-g") #'dino-dired-kill-new-file-contents)
-;;   (define-key dired-mode-map (kbd "C-c C-c") #'dino-dired-copy-file-to-dir-in-other-window)
-;;   (define-key dired-mode-map (kbd "C-c C-m") #'dino-dired-move-file-to-dir-in-other-window)
-;;   (define-key dired-mode-map (kbd "C-c m")   #'magit-status)
-;;   (define-key dired-mode-map (kbd "C-x m")   #'magit-status)
-;;   ;; converse of i (dired-maybe-insert-subdir)
-;;   (define-key dired-mode-map (kbd "K")  #'dired-kill-subdir)
-;;   (define-key dired-mode-map (kbd "F")  #'dino-dired-do-find)
-;;   (define-key dired-mode-map (kbd "s")  #'dino-dired-sort-cycle)
-;;   (dino-dired-sort-cycle "t") ;; by default, sort by time
-;;   (turn-on-auto-revert-mode))
-
-(with-eval-after-load 'dired
+        wdired-allow-to-change-permissions t)
   (add-hook! 'dired-mode-hook 'context-menu-mode))
-
-
-(after! org
-  (load! "./lisp/setup-org"))
 
 (smart-cursor-color-mode +1)
 
@@ -150,7 +136,6 @@
 (map! "C-c C-n"  #'ash/cleanup-buffer)
 (map! "C-c P"    #'ash/copy-file-name-to-clipboard)
 (map! "C-c r"    #'consult-ripgrep)
-;;(map! "C-g"      #'prot/keyboard-quit-dwim)
 (map! "C-s"      #'+default/search-buffer)
 (map! "C-x k"    #'kill-current-buffer)
 (map! "C-x C-j"  #'ash/kill-other-buffers)
@@ -168,19 +153,25 @@
   (browse-url (concat "http://localhost:" (number-to-string port) "/")))
 
 
-(setq calendar-week-start-day 1
-      calendar-day-name-array ["domingo" "lunes" "martes" "miércoles"
-                               "jueves" "viernes" "sábado"]
-      calendar-month-abbrev-array ["dom" "lun" "mar" "mié"
-                                   "jue" "vie" "sáb"]
-      calendar-month-name-array ["enero" "febrero" "marzo" "abril"
-                                 "mayo" "junio" "julio" "agosto"
-                                 "septiembre" "octubre" "noviembre"
-                                 "diciembre"]
-      calendar-month-abbrev-array ["ene" "feb" "mar" "abr"
-                                   "may" "jun" "jul" "ago"
-                                   "sep" "oct" "nov"
-                                   "dic"])
+(use-package! mexican-holidays
+  :config
+  (customize-set-variable 'holiday-bahai-holidays nil)
+  (customize-set-variable 'holiday-hebrew-holidays nil)
+  (customize-set-variable 'holiday-islamic-holidays nil)
+  (setq calendar-holidays (append calendar-holidays holiday-mexican-holidays))
+
+  (setq calendar-week-start-day 1
+        calendar-day-name-array ["domingo" "lunes" "martes" "miércoles"
+                                 "jueves" "viernes" "sábado"]
+        calendar-month-abbrev-array ["dom" "lun" "mar" "mié"
+                                     "jue" "vie" "sáb"]
+        calendar-month-name-array ["enero" "febrero" "marzo" "abril"
+                                   "mayo" "junio" "julio" "agosto"
+                                   "septiembre" "octubre" "noviembre"
+                                   "diciembre"]
+        calendar-month-abbrev-array ["ene" "feb" "mar" "abr"
+                                     "may" "jun" "jul" "ago"
+                                     "sep" "oct" "nov" "dic"]))
 
 ;;;; World clock (M-x world-clock)
 (use-package! time
@@ -189,21 +180,17 @@
   :config
   (setq world-clock-list t)
   (setq zoneinfo-style-world-list ; M-x shell RET timedatectl list-timezones
-        '(("America/Los_Angeles" "San Diego")
-          ("America/New_York" "New York")
+        '(("America/New_York" "New York")
           ("America/Toronto" "Toronto")
-          ("America/Vancouver" "Vancouver")
           ("America/Santiago" "Santiago")
+          ("UTC" "UTC")
+          ("Europe/Lisbon" "Lisbon")
           ("Europe/London" "London")
           ("Europe/Paris" "Paris")
           ("Europe/Amsterdam" "Rotterdam")
-          ("UTC" "UTC")
-          ("Europe/Lisbon" "Lisbon")
-          ("Europe/Brussels" "Brussels")
           ("Asia/Jerusalem" "Belén")
-          ("Asia/Calcutta" "Bangalore")
           ("Asia/Tokyo" "Tokyo")
-          ("Australia/Sydney" "Sydney")))
+          ))
 
   ;; All of the following variables are for Emacs 28
   (setq world-clock-list t)
@@ -225,27 +212,6 @@
 
 (setq lsp-julia-package-dir nil
       lsp-julia-default-environment "~/.julia/environments/v1.12")
-
-(after! company
-  (setq company-idle-delay 0.5
-        company-selection-wrap-around t
-        company-require-match 'never
-        company-dabbrev-downcase nil
-        company-dabbrev-ignore-case t
-        company-dabbrev-other-buffers nil
-        company-tooltip-limit 5
-        company-tooltip-minimum-width 40
-        company-tooltip-align-annotations t
-        company-transformers '(company-sort-by-occurrence))
-  (set-company-backend!
-   '(text-mode
-     markdown-mode
-     gfm-mode)
-   '(:separate
-     company-files))
-  )
-
-(use-package! ocp-indent)
 
 (use-package! pyvenv
   :config
@@ -294,47 +260,23 @@
       +python-jupyter-repl-args '("--simple-prompt"))
 
 
-(after! tramp
-  ;; (add-to-list 'tramp-backup-directory-alist
-  ;;             (cons tramp-file-name-regexp nil))
-  (add-to-list 'tramp-connection-properties
-               (list (regexp-quote "/scp:saade.me:")
-                     "direct-async-process" t))
-  (add-to-list 'tramp-connection-properties
-               (list (regexp-quote "/scp:4gps:")
-                     "direct-async-process" t))
+(after! projectile
+  (setq projectile-project-root-files-bottom-up
+        (remove ".git" projectile-project-root-files-bottom-up))
 
-  (setq delete-by-moving-to-trash nil)
+  (setq projectile-ignored-projects
+        (list "~/" "~/tmp" "/tmp" (expand-file-name "straight/repos" doom-local-dir)))
 
-  ;; Tips to speed up connections
-  (setq tramp-use-scp-direct-remote-copying t
-        tramp-verbose 0
-        tramp-chunksize 2000
-        tramp-use-ssh-controlmaster-options nil
-        vc-ignore-dir-regexp
-        (format "\\(%s\\)\\|\\(%s\\)"
-                vc-ignore-dir-regexp
-                tramp-file-name-regexp))
-  (setenv "SHELL" "/bin/bash")
-  (setq tramp-shell-prompt-pattern "\\(?:^\\|\n\\|\x0d\\)[^]#$%>\n]*#?[]#$%>] *\\(\e\\[[0-9;]*[a-zA-Z] *\\)*")
-  (customize-set-variable 'tramp-default-method "scp"))
-
-
-;; (after! projectile
-;;   (setq projectile-project-root-files-bottom-up
-;;         (remove ".git" projectile-project-root-files-bottom-up)))
-
-(setq projectile-ignored-projects
-      (list "~/" "~/tmp" "/tmp" (expand-file-name "straight/repos" doom-local-dir)))
-
-(defun projectile-ignored-project-function (filepath)
-  "Return t if FILEPATH is within any of `projectile-ignored-projects'"
-  (or (mapcar (lambda (p) (string-prefix-p p filepath)) projectile-ignored-projects)))
+  (defun projectile-ignored-project-function (filepath)
+    "Return t if FILEPATH is within any of `projectile-ignored-projects'"
+    (or (mapcar (lambda (p) (string-prefix-p p filepath)) projectile-ignored-projects))))
 
 (setq undo-limit 67108864) ; 64mb.
 (setq undo-strong-limit 100663296) ; 96mb.
 (setq undo-outer-limit 1006632960) ; 960mb.
 
+;;;===================================================================================
+;;; Benchmark
 (my/report-time "System")
 
 (let ((init-time (float-time (time-subtract (current-time) my/init-start-time)))
