@@ -43,7 +43,9 @@
 
   ;; HACK In case `+snippets-dir' and `doom-snippets-dir' are the same, or
   ;;      duplicates exist in `yas-snippet-dirs'.
-  (advice-add #'yas-snippet-dirs :filter-return #'delete-dups)
+  (defadvice! +snippets--remove-duplicate-dirs-a (dirs)
+    :filter-return #'yas-snippet-dirs
+    (cl-delete-duplicates dirs :test #'string= :key #'expand-file-name :from-end t))
 
   ;; Remove GUI dropdown prompt (prefer ivy/helm)
   ; (delq! 'yas-dropdown-prompt yas-prompt-functions)
